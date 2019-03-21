@@ -1,0 +1,54 @@
+{
+  "name": "tsdatautils-core",
+  "version": "0.0.1-beta5",
+  "description": "TypeScript core classes for the other data utilities",
+  "engineStrict": true,
+  "main": "./build/src/main.js",
+  "types": "./build/src/main.d.ts",
+  "engines": {
+    "node": ">= 8.9.0"
+  },
+  "devDependencies": {
+    "@types/jest": "~22.2.0",
+    "@types/node": "~8.5.8",
+    "@types/winston": "~2.3.7",
+    "@types/nconf": "~0.0.37",
+    "jest": "~22.4.1",
+    "rimraf": "~2.6.2",
+    "tslint": "~5.9.1",
+    "tslint-microsoft-contrib": "~5.0.2",
+    "tsutils": "~2.18.0",
+    "typescript": "~2.6.2",
+    "ts-jest": "~22.4.1"
+  },
+  "scripts": {
+    "clean": "rimraf coverage build tmp logs",
+    "build": "tsc --project tsconfig.release.json",
+    "build-prod": "tsc --project tsconfig.release.json",
+    "lint": "tslint -t stylish --project \"tsconfig.json\"",
+    "lint-autofix": "tslint -t stylish --fix --project \"tsconfig.json\"",
+    "pretest": "npm run lint --force",
+    "test": "npm run test-only",
+    "test-only": "jest --coverage",
+    "test:watch": "jest --watch",
+    "test-basic": "jest",
+    "test-azure": "jest --rootDir=./ --config=./jest/jest.azure.config.js",
+    "publish-npm": "npm run clean && npm run build-prod && npm publish"
+  },
+  "author": "Mitch Chiles <mitchchiles@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MitchCodes/Typescript-DataUtils.git"
+  },
+  "bugs": {
+    "url": "https://github.com/MitchCodes/Typescript-DataUtils/issues"
+  },
+  "homepage": "https://github.com/MitchCodes/Typescript-DataUtils#about",
+  "dependencies": {
+    "tslib": "~1.8.1",
+    "winston": "2.3.0",
+    "winston-daily-rotate-file": "~1.7.2",
+    "nconf": "~0.10.0",
+    "moment": "^2.24.0"
+  }
+}
