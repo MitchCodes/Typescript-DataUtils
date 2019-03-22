@@ -23,8 +23,8 @@ export class AzureTableDocumentCacheInMemory<T extends DocumentIdentifier> imple
 
     public constructor(doCleanup: boolean = true, cleanupInterval: moment.Duration = moment.duration(5, 'hours')) {
         this.doCleanup = doCleanup;
-        this.cleanupInterval = this.cleanupInterval;
-        this.nextCleanup = moment().add(this.cleanupInterval);
+        this.cleanupInterval = cleanupInterval;
+        this.nextCleanup = moment().add(cleanupInterval);
     }
 
     public getItem(table: string, id: DocumentIdentifier): T {

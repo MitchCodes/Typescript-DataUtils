@@ -50,6 +50,6 @@
     "winston-daily-rotate-file": "~1.7.2",
     "nconf": "~0.10.0",
     "moment": "^2.24.0",
-    "tsdatautils-core": "0.0.1-beta5"
+    "tsdatautils-core": "0.0.1-beta8"
   }
 }
