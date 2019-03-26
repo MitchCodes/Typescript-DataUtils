@@ -1,7 +1,7 @@
 {
-  "name": "tsdatautils-memorycache",
+  "name": "tsdatautils-rediscache",
   "version": "0.0.1-beta10",
-  "description": "TypeScript classes for caching utilities from in memory",
+  "description": "TypeScript data utilities for redis",
   "engineStrict": true,
   "main": "./build/src/main.js",
   "types": "./build/src/main.d.ts",
@@ -13,6 +13,7 @@
     "@types/node": "~8.5.8",
     "@types/winston": "~2.3.7",
     "@types/nconf": "~0.0.37",
+    "@types/redis": "^2.8.11",
     "jest": "~22.4.1",
     "rimraf": "~2.6.2",
     "tslint": "~5.9.1",
@@ -34,8 +35,8 @@
     "test": "npm run test-only",
     "test-only": "jest --coverage",
     "test:watch": "jest --watch",
-    "test-main": "jest",
-    "test-basic": "jest --rootDir=./ --config=./jest/jest.basic.config.js",
+    "test-basic": "jest",
+    "test-redis": "jest --rootDir=./ --config=./jest/jest.redis.config.js",
     "publish-npm": "npm run clean && npm run build-prod && npm publish"
   },
   "author": "Mitch Chiles <mitchchiles@gmail.com>",
@@ -48,8 +49,10 @@
   },
   "homepage": "https://github.com/MitchCodes/Typescript-DataUtils#about",
   "dependencies": {
-    "tslib": "~1.8.1",
     "moment": "^2.24.0",
-    "tsdatautils-core": "0.0.1-beta10"
+    "redis": "^2.8.0",
+    "util": "^0.11.1",
+    "tslib": "~1.8.1",
+    "tsdatautils-core": "^0.0.1-beta10"
   }
 }
