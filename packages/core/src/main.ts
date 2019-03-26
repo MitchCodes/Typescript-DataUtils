@@ -5,7 +5,7 @@ export { Dictionary } from './models/dictionary';
 export { BatchResultStatus, IBatchResult, IBatchResults } from './models/batch-result';
 export { ITableCache } from './models/table-cache';
 export { IDocumentStorageManager } from './models/document-storage-manager';
-export { IBasicCache, IBasicTimedCache, IClearableCache } from './models/basic-cache';
+export { IBasicCache, IBasicTimedCache, IClearableCache, IBasicAsyncCache, IBasicAsyncTimedCache, IAsyncClearableCache } from './models/basic-cache';
 
 // Helpers
 export { ModelComparer } from './logic/helpers/modelcompare.helper';
