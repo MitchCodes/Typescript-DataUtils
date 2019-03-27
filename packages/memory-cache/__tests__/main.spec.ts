@@ -5,13 +5,13 @@ describe('basic test', () => {
   // Act before assertions
   beforeAll(async () => {
     jest.runOnlyPendingTimers();
+  });
 
-    // tslint:disable-next-line:mocha-unneeded-done
-    it('expect true to be true', (done: any) => {
-      expect(true).toBeTruthy();
-      
-      done();
-    });
+  // tslint:disable-next-line:mocha-unneeded-done
+  it('expect true to be true', (done: any) => {
+    expect(true).toBeTruthy();
+    
+    done();
   });
 
 });

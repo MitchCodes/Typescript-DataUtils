@@ -24,6 +24,8 @@
     "no-any": false,
     "no-this-assignment": false,
     "no-var-self": false,
+    "no-unsafe-any": false,
+    "completed-docs": false,
     "no-debugger": false,
     "max-line-length": false,
     "interface-name": false, // https://github.com/Microsoft/TypeScript/wiki/Coding-guidelines <-- interfaces should not start with I

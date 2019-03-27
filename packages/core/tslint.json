@@ -22,6 +22,8 @@
     "prefer-template": false,
     "no-backbone-get-set-outside-model": false,
     "no-any": false,
+    "no-unsafe-any": false,
+    "completed-docs": false,
     "no-this-assignment": false,
     "no-var-self": false,
     "no-debugger": false,
