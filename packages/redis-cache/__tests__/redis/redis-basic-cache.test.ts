@@ -4,7 +4,6 @@ import { BasicRedisCache } from '../../src/main';
 import { WinstonLogger, ModelComparer } from 'tsdatautils-core';
 jest.mock('../../src/data/basic-redis-cache');
 
-
 export class CarTest {
   public partitionKey: string;
   public rowKey: string;
@@ -23,7 +22,6 @@ export class CarTest {
   }
 }
 
-
 describe('redis cache tests', () => {
     // Read more about fake timers: http://facebook.github.io/jest/docs/en/timer-mocks.html#content
     //jest.useFakeTimers();
@@ -40,10 +38,8 @@ describe('redis cache tests', () => {
       nconf.file({ file: './config.common.json' });
       nconf.defaults({
             test: {
-                azure: {
-                    testAccount: '',
-                    testAccountKey: '',
-                    testTable: 'unittests',
+                redis: {
+                    host: '127.0.0.1',
                 },
             },
         });
@@ -90,12 +86,9 @@ describe('redis cache tests', () => {
           expect(val).not.toBeUndefined();
           expect(val).not.toBeNull();
 
-          let jsonStringAfter = JSON.stringify(val);
-          expect(jsonStringBefore === jsonStringAfter).toBeTruthy();
-
           //expect(testModel.make === val.make).toBeTruthy();
 
-          //expect(carComparer.propertiesAreEqualToFirst(testModel, val)).toBeTruthy();
+          expect(carComparer.propertiesAreEqualToFirst(testModel, val)).toBeTruthy();
           
           done();
         });
@@ -117,8 +110,30 @@ describe('redis cache tests', () => {
           basicRedisCache.removeItemAsync('test3').then(() => {
             // tslint:disable-next-line: no-floating-promises
             basicRedisCache.getItemAsync<CarTest>('test3').then((val2: CarTest) => {
-              expect(val).toBeUndefined();
-              //expect(val).toBeNull();
+              expect(val2).toBeNull();
+
+              done();
+            });
+          });
+        });
+      });
+    });
+
+    test('redis cache can clear all', (done: any) => {
+      let basicRedisCache: BasicRedisCache = new BasicRedisCache(consoleLogger, 'main4', redisHost);
+
+      // tslint:disable-next-line: no-floating-promises
+      basicRedisCache.setItemAsync('test4', testModel).then((success: boolean) => {
+        // tslint:disable-next-line: no-floating-promises
+        basicRedisCache.getItemAsync<CarTest>('test4').then((val: CarTest) => {
+          expect(val).not.toBeUndefined();
+          expect(val).not.toBeNull();
+
+          // tslint:disable-next-line: no-floating-promises
+          basicRedisCache.clearCacheAsync().then(() => {
+            // tslint:disable-next-line: no-floating-promises
+            basicRedisCache.getItemAsync<CarTest>('test4').then((val2: CarTest) => {
+              expect(val2).toBeNull();
 
               done();
             });

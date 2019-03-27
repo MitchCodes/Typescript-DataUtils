@@ -1,4 +1,4 @@
-import { IBasicCache, IBasicTimedCache, IClearableCache, Dictionary, IBasicAsyncCache, IBasicAsyncTimedCache, IAsyncClearableCache, ILogger } from 'tsdatautils-core';
+import { IBasicCache, IBasicTimedCache, IClearableCache, Dictionary, IBasicAsyncCache, IBasicAsyncTimedCache, IAsyncClearableCache, ILogger, JsonSerializer, DateJsonPropertyHandler, UndefinedJsonPropertyHandler } from 'tsdatautils-core';
 import * as moment from 'moment';
 import { RedisClient, ClientOpts, createClient, RetryStrategyOptions, RetryStrategy } from 'redis';
 import { ClientResponse } from 'http';
@@ -133,8 +133,15 @@ export class BasicRedisCache implements IBasicAsyncCache, IBasicAsyncTimedCache,
                     // tslint:disable-next-line: no-unsafe-any
                     getAsync(key).then((res: string) => {
                         try {
-                            let resParsed: T = JSON.parse(res);
-                            resolve(resParsed);
+                            if (res === undefined) {
+                                resolve(undefined);
+                            } else if (res === null) {
+                                resolve(null);
+                            } else {
+                                let jsonSerializer: JsonSerializer = new JsonSerializer([new DateJsonPropertyHandler(), new UndefinedJsonPropertyHandler()]);
+                                let resParsed: T = jsonSerializer.parse(res);
+                                resolve(resParsed);
+                            }                            
                         } catch (err) {
                             reject(err);
                         }
@@ -156,7 +163,12 @@ export class BasicRedisCache implements IBasicAsyncCache, IBasicAsyncTimedCache,
                 let client: RedisClient = BasicRedisCache.clients[this.clientKey];
                 this.throwIfClientDoesNotExist(client);
                 this.confirmConnection(client).then(() => {
-                    let itemStringified: string = JSON.stringify(item);
+                    let itemStringified: string = null;
+
+                    if (item !== undefined && item !== null) {
+                        let jsonSerializer: JsonSerializer = new JsonSerializer([new DateJsonPropertyHandler(), new UndefinedJsonPropertyHandler()]);
+                        itemStringified = jsonSerializer.stringify(item);
+                    }
 
                     let setAsync: any = promisify(client.set).bind(client);
                     let setPromise: any = null;
@@ -230,8 +242,6 @@ export class BasicRedisCache implements IBasicAsyncCache, IBasicAsyncTimedCache,
             throw new Error('Redis client missing.');
         }
     }
-
-
 
     private confirmConnection(client: RedisClient): Promise<void> {
         return new Promise<void>((resolve: () => void, reject: (reason: any) => void) => {

@@ -1,0 +1,56 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "name": "Core Jest Debug",
+            "request": "launch",
+            "program": "${workspaceFolder}/packages/core/node_modules/jest/bin/jest",
+            "args": [
+                "--runInBand"
+            ],
+            "cwd": "${workspaceFolder}/packages/core",
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen"
+        },
+        {
+            "type": "node",
+            "name": "Azure Table Storage Jest Debug",
+            "request": "launch",
+            "program": "${workspaceFolder}/packages/azure-table-storage/node_modules/jest/bin/jest",
+            "args": [
+                "--runInBand", "--rootDir=./", "--config=./jest/jest.azure.config.js"
+            ],
+            "cwd": "${workspaceFolder}/packages/azure-table-storage",
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen"
+        },
+        {
+            "type": "node",
+            "name": "Memory Cache Jest Debug",
+            "request": "launch",
+            "program": "${workspaceFolder}/packages/memory-cache/node_modules/jest/bin/jest",
+            "args": [
+                "--runInBand", "--rootDir=./", "--config=./jest/jest.basic.config.js"
+            ],
+            "cwd": "${workspaceFolder}/packages/memory-cache",
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen"
+        },
+        {
+            "type": "node",
+            "name": "Redis-cache Jest Debug",
+            "request": "launch",
+            "program": "${workspaceFolder}/packages/redis-cache/node_modules/jest/bin/jest",
+            "args": [
+                "--runInBand", "--rootDir=./", "--config=./jest/jest.redis.config.js"
+            ],
+            "cwd": "${workspaceFolder}/packages/redis-cache",
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen"
+        }
+    ]
+}

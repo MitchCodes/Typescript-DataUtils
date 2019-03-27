@@ -7,9 +7,15 @@ export { ITableCache } from './models/table-cache';
 export { IDocumentStorageManager } from './models/document-storage-manager';
 export { IBasicCache, IBasicTimedCache, IClearableCache, IBasicAsyncCache, IBasicAsyncTimedCache, IAsyncClearableCache } from './models/basic-cache';
 export { ILogger } from './models/logger';
+export { IJsonParser, IJsonPropertyHandler, IJsonStringifier } from './models/json-serialization';
 
 // Helpers
 export { ModelComparer } from './logic/helpers/modelcompare.helper';
 
 // Loggers
 export { WinstonLogger } from './logic/loggers/winston-logger';
+
+// Json Serialization
+export { JsonSerializer } from './logic/json-serialization/json-serializer';
+export { DateJsonPropertyHandler } from './logic/json-serialization/date-property-handler';
+export { UndefinedJsonPropertyHandler } from './logic/json-serialization/undefined-property-handler';
