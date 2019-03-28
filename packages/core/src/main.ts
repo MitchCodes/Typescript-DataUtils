@@ -1,5 +1,5 @@
 // Models
-export { OperationResultStatus, IOperationResult } from './models/operation-result';
+export { OperationResultStatus, IOperationResult, IOperationResultWithData } from './models/operation-result';
 export { DocumentIdentifier, BasicDocumentIdentifier } from './models/document-identifier';
 export { Dictionary } from './models/dictionary';
 export { BatchResultStatus, IBatchResult, IBatchResults } from './models/batch-result';

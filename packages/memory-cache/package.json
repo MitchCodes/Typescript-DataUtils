@@ -1,6 +1,6 @@
 {
   "name": "tsdatautils-memorycache",
-  "version": "0.0.1-beta17",
+  "version": "0.0.1-beta21",
   "description": "TypeScript classes for caching utilities from in memory",
   "engineStrict": true,
   "main": "./build/src/main.js",
@@ -50,6 +50,6 @@
   "dependencies": {
     "tslib": "~1.8.1",
     "moment": "^2.24.0",
-    "tsdatautils-core": "0.0.1-beta17"
+    "tsdatautils-core": "0.0.1-beta21"
   }
 }

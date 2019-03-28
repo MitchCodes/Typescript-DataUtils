@@ -1,7 +1,7 @@
 import { TableService, ErrorOrResult, TableUtilities, ExponentialRetryPolicyFilter, 
     createTableService, TableQuery, TableBatch } from 'azure-storage';
 import * as moment from 'moment';
-import { DocumentIdentifier, IOperationResult, OperationResultStatus, Dictionary, IDocumentStorageManager, BatchResultStatus, IBatchResult, IBatchResults, ITableCache, BasicDocumentIdentifier } from 'tsdatautils-core';
+import { DocumentIdentifier, IOperationResult, OperationResultStatus, Dictionary, IDocumentStorageManager, BatchResultStatus, IBatchResult, IBatchResults, ITableCache, BasicDocumentIdentifier, IOperationResultWithData } from 'tsdatautils-core';
 
 export interface IAzureDocumentSavable {
     partitionKey: string;
@@ -10,7 +10,7 @@ export interface IAzureDocumentSavable {
     handleVersionChange(inputObject: Object, inputVersion: number, latestVersion: number): boolean;
 }
 
-export class AzureDocumentResult<T extends IAzureDocumentSavable> implements IOperationResult {
+export class AzureDocumentResult<T extends IAzureDocumentSavable> implements IOperationResultWithData<T[]> {
     public status: OperationResultStatus;
     public error: Error;
     public message: string;

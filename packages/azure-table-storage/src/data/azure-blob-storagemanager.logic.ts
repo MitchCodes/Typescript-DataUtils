@@ -1,16 +1,16 @@
 import { BlobService, ExponentialRetryPolicyFilter, ServiceResponse } from 'azure-storage';
-import { IOperationResult, OperationResultStatus, IBlobStorageManager } from 'tsdatautils-core';
+import { IOperationResult, OperationResultStatus, IBlobStorageManager, IOperationResultWithData } from 'tsdatautils-core';
 import { Readable, Writable } from 'stream';
 
-export class AzureBlobOperationResult implements IOperationResult {
+export class AzureBlobOperationResult<T> implements IOperationResultWithData<T> {
     public status: OperationResultStatus;
     public error: Error;
     public message: string;
-    public data: any;
+    public data: T;
 
     // tslint:disable-next-line:function-name
-    public static buildSimpleError(errorString: string, errorObj: Error = null): AzureBlobOperationResult {
-        let azureRes: AzureBlobOperationResult = new this();
+    public static buildSimpleError(errorString: string, errorObj: Error = null): AzureBlobOperationResult<any> {
+        let azureRes: AzureBlobOperationResult<any> = new this();
         azureRes.status = OperationResultStatus.error;
         azureRes.message = errorString;
 
@@ -62,7 +62,7 @@ export class AzureBlobStorageManager implements IBlobStorageManager {
                     return;
                 }
 
-                let promiseResult: AzureBlobOperationResult = new AzureBlobOperationResult();
+                let promiseResult: AzureBlobOperationResult<any> = new AzureBlobOperationResult();
                 promiseResult.status = OperationResultStatus.success;
 
                 resolve(promiseResult);
@@ -79,7 +79,7 @@ export class AzureBlobStorageManager implements IBlobStorageManager {
                     return;
                 }
     
-                let promiseResult: AzureBlobOperationResult = new AzureBlobOperationResult();
+                let promiseResult: AzureBlobOperationResult<any> = new AzureBlobOperationResult();
                 promiseResult.status = OperationResultStatus.success;
     
                 resolve(promiseResult);
@@ -87,20 +87,26 @@ export class AzureBlobStorageManager implements IBlobStorageManager {
         });
     }
 
-    public createBlobFromStream(container: string, blob: string, stream: Readable, streamLength: number, options: BlobService.CreateBlockBlobRequestOptions = {}): Promise<IOperationResult> {
-        return new Promise<IOperationResult>((resolve: (val: IOperationResult) => void, reject: (reason: any) => void) => {
-            this.blobService.createBlockBlobFromStream(container, blob, stream, streamLength, options, (err: Error, result: BlobService.BlobResult, response: ServiceResponse) => {
+    public createBlobWritingStream(container: string, blob: string, options: BlobService.CreateBlockBlobRequestOptions = {}): Promise<IOperationResultWithData<Writable>> {
+        return new Promise<IOperationResultWithData<Writable>>((resolve: (val: IOperationResultWithData<Writable>) => void, reject: (reason: any) => void) => {
+            /* let writableStream: Writable = this.blobService.createWriteStreamToBlockBlob(container, blob, options, (err: Error, result: BlobService.BlobResult, response: ServiceResponse) => {
                 if (err !== undefined && err !== null) {
                     reject(err);
     
                     return;
                 }
     
-                let promiseResult: AzureBlobOperationResult = new AzureBlobOperationResult();
+                let promiseResult: AzureBlobOperationResult<Writable> = new AzureBlobOperationResult();
                 promiseResult.status = OperationResultStatus.success;
+                promiseResult.data = writableStream;
     
                 resolve(promiseResult);
-            });
+            }); */
+            let promiseResult: AzureBlobOperationResult<Writable> = new AzureBlobOperationResult();
+            promiseResult.status = OperationResultStatus.success;
+            promiseResult.data = this.blobService.createWriteStreamToBlockBlob(container, blob, options);
+
+            resolve(promiseResult);
         });
     }
 
@@ -113,7 +119,7 @@ export class AzureBlobStorageManager implements IBlobStorageManager {
                     return;
                 }
     
-                let promiseResult: AzureBlobOperationResult = new AzureBlobOperationResult();
+                let promiseResult: AzureBlobOperationResult<any> = new AzureBlobOperationResult();
                 promiseResult.status = OperationResultStatus.success;
     
                 resolve(promiseResult);
@@ -130,7 +136,7 @@ export class AzureBlobStorageManager implements IBlobStorageManager {
                     return;
                 }
     
-                let promiseResult: AzureBlobOperationResult = new AzureBlobOperationResult();
+                let promiseResult: AzureBlobOperationResult<any> = new AzureBlobOperationResult();
                 promiseResult.status = OperationResultStatus.success;
     
                 resolve(promiseResult);
@@ -147,7 +153,7 @@ export class AzureBlobStorageManager implements IBlobStorageManager {
                     return;
                 }
     
-                let promiseResult: AzureBlobOperationResult = new AzureBlobOperationResult();
+                let promiseResult: AzureBlobOperationResult<any> = new AzureBlobOperationResult();
                 promiseResult.status = OperationResultStatus.success;
     
                 resolve(promiseResult);

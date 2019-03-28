@@ -7,7 +7,7 @@ import * as nconf from 'nconf';
 import { ModelComparer, IOperationResult, OperationResultStatus, BatchResultStatus } from 'tsdatautils-core';
 import { TableQuery } from 'azure-storage';
 import * as moment from 'moment';
-jest.mock('../../src/data/azurestoragemanager.logic');
+jest.mock('../../src/data/azure-document-storagemanager.logic');
 
 export class CarTest implements IAzureDocumentSavable {
     public partitionKey: string;

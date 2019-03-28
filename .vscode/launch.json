@@ -30,6 +30,18 @@
         },
         {
             "type": "node",
+            "name": "Azure Table Storage Blob Jest Debug",
+            "request": "launch",
+            "program": "${workspaceFolder}/packages/azure-table-storage/node_modules/jest/bin/jest",
+            "args": [
+                "--runInBand", "--rootDir=./", "--config=./jest/jest.azureblob.config.js"
+            ],
+            "cwd": "${workspaceFolder}/packages/azure-table-storage",
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen"
+        },
+        {
+            "type": "node",
             "name": "Memory Cache Jest Debug",
             "request": "launch",
             "program": "${workspaceFolder}/packages/memory-cache/node_modules/jest/bin/jest",

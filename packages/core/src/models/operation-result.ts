@@ -9,5 +9,11 @@ export interface IOperationResult {
     status: OperationResultStatus;
     error: Error;
     message: string;
-    data: any;
+}
+
+export interface IOperationResultWithData<T> {
+    status: OperationResultStatus;
+    error: Error;
+    message: string;
+    data: T;
 }

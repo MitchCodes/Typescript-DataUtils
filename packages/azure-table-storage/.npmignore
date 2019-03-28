@@ -21,6 +21,9 @@ coverage
 # Optional npm cache directory
 .npm
 
+# Temp
+tmp/
+
 # Optional eslint cache
 .eslintcache
 
