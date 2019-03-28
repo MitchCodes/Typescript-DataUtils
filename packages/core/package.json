@@ -1,6 +1,6 @@
 {
   "name": "tsdatautils-core",
-  "version": "0.0.1-beta15",
+  "version": "0.0.1-beta17",
   "description": "TypeScript core classes for the other data utilities",
   "engineStrict": true,
   "main": "./build/src/main.js",

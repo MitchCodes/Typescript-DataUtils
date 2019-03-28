@@ -129,6 +129,8 @@ export class AzureDocumentStorageManager<T extends IAzureDocumentSavable> implem
             let retryFilter: ExponentialRetryPolicyFilter = new ExponentialRetryPolicyFilter(0, 300, 300, 10000);
             if (this.azureStorageAccount !== '' && this.azureStorageKey !== '') {
                 this.tblService = new TableService(this.azureStorageAccount, this.azureStorageKey).withFilter(retryFilter);
+            } else if (this.azureStorageAccount !== '') {
+                this.tblService = new TableService(this.azureStorageAccount).withFilter(retryFilter);
             } else {
                 this.tblService = new TableService().withFilter(retryFilter);
             }

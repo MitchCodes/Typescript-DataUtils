@@ -8,6 +8,7 @@ export { IDocumentStorageManager } from './models/document-storage-manager';
 export { IBasicCache, IBasicTimedCache, IClearableCache, IBasicAsyncCache, IBasicAsyncTimedCache, IAsyncClearableCache } from './models/basic-cache';
 export { ILogger } from './models/logger';
 export { IJsonParser, IJsonPropertyHandler, IJsonStringifier } from './models/json-serialization';
+export { IBlobStorageManager } from './models/blob-storage-manager';
 
 // Helpers
 export { ModelComparer } from './logic/helpers/modelcompare.helper';

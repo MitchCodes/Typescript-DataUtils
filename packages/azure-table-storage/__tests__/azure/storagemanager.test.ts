@@ -1,7 +1,7 @@
 // tslint:disable:no-console no-require-imports no-var-requires
 import { AzureDocumentStorageManager, IAzureDocumentSavable, AzureDocumentResult, 
          AzureDocumentBatchResult, AzureDocumentBatchResults, 
-         AzureTableDocumentCacheInMemory, AzureDocumentIdentifier } from '../../src/data/azurestoragemanager.logic';
+         AzureTableDocumentCacheInMemory, AzureDocumentIdentifier } from '../../src/data/azure-document-storagemanager.logic';
 import * as winston from 'winston';
 import * as nconf from 'nconf';
 import { ModelComparer, IOperationResult, OperationResultStatus, BatchResultStatus } from 'tsdatautils-core';
