@@ -1,5 +1,5 @@
-import { BlobService, ExponentialRetryPolicyFilter, ServiceResponse } from 'azure-storage';
-import { IOperationResult, OperationResultStatus, IBlobStorageManager, IOperationResultWithData } from 'tsdatautils-core';
+import { BlobService, ExponentialRetryPolicyFilter, ServiceResponse, common } from 'azure-storage';
+import { IOperationResult, OperationResultStatus, IBlobStorageManager, IOperationResultWithData, Dictionary, BlobInfo } from 'tsdatautils-core';
 import { Readable, Writable } from 'stream';
 
 export class AzureBlobOperationResult<T> implements IOperationResultWithData<T> {
@@ -56,6 +56,23 @@ export class AzureBlobStorageManager implements IBlobStorageManager {
     public createContainerIfNotExists(containerName: string, containerOptions: BlobService.CreateContainerOptions = {}): Promise<IOperationResult> {
         return new Promise<IOperationResult>((resolve: (val: IOperationResult) => void, reject: (reason: any) => void) => {
             this.blobService.createContainerIfNotExists(containerName, containerOptions, (err: Error, result: BlobService.ContainerResult, response: ServiceResponse) => {
+                if (err !== undefined && err !== null) {
+                    reject(err);
+
+                    return;
+                }
+
+                let promiseResult: AzureBlobOperationResult<any> = new AzureBlobOperationResult();
+                promiseResult.status = OperationResultStatus.success;
+
+                resolve(promiseResult);
+            });
+        });
+    }
+
+    public deleteContainerIfExists(container: string): Promise<IOperationResult> {
+        return new Promise<IOperationResult>((resolve: (val: IOperationResult) => void, reject: (reason: any) => void) => {
+            this.blobService.deleteContainerIfExists(container, (err: Error, result: boolean, response: ServiceResponse) => {
                 if (err !== undefined && err !== null) {
                     reject(err);
 
@@ -157,6 +174,57 @@ export class AzureBlobStorageManager implements IBlobStorageManager {
                 promiseResult.status = OperationResultStatus.success;
     
                 resolve(promiseResult);
+            });
+        });
+    }
+
+    public getBlobs(container: string): Promise<IOperationResultWithData<Dictionary<BlobInfo>>> {
+        return new Promise<IOperationResultWithData<Dictionary<BlobInfo>>>((resolve: (val: IOperationResultWithData<Dictionary<BlobInfo>>) => void, reject: (reason: any) => void) => {
+            let returnDict: Dictionary<BlobInfo> = {};
+
+            this.getBlobsContinuation(container, null, returnDict).then((res: IOperationResultWithData<Dictionary<BlobInfo>>) => {
+                resolve(res);
+            }).catch((err: any) => {
+                reject(err);
+            });
+        });
+    }
+
+    private getBlobsContinuation(container: string, continuationToken: common.ContinuationToken, currentBlobDict: Dictionary<BlobInfo>): Promise<IOperationResultWithData<Dictionary<BlobInfo>>> {
+        return new Promise<IOperationResultWithData<Dictionary<BlobInfo>>>((resolve: (val: IOperationResultWithData<Dictionary<BlobInfo>>) => void, reject: (reason: any) => void) => {
+            this.blobService.listBlobsSegmented(container, continuationToken, (err: Error, result: BlobService.ListBlobsResult, response: ServiceResponse) => {
+                if (err !== undefined && err !== null) {
+                    reject(err);
+    
+                    return;
+                }
+
+                for (let blobResult of result.entries) {
+                    let blobInfo: BlobInfo = new BlobInfo();
+                    blobInfo.name = blobResult.name;
+                    blobInfo.containerName = container;
+                    blobInfo.contentLength = blobResult.contentLength;
+                    blobInfo.creationTime = new Date(blobResult.creationTime);
+                    blobInfo.deleted = blobResult.deleted;
+                    blobInfo.deletedTime = new Date(blobResult.deletedTime);
+                    blobInfo.lastModifiedTime = new Date(blobResult.lastModified);
+                    
+                    currentBlobDict[blobResult.name] = blobInfo;
+                }
+
+                if (result.continuationToken !== undefined && result.continuationToken !== null) {
+                    this.getBlobsContinuation(container, result.continuationToken, currentBlobDict).then((cRes: IOperationResultWithData<Dictionary<BlobInfo>>) => {
+                        resolve(cRes);
+                    }).catch((cErr: any) => {
+                        reject(cErr);
+                    });
+                } else {
+                    let returnResult: AzureBlobOperationResult<Dictionary<BlobInfo>> = new AzureBlobOperationResult<Dictionary<BlobInfo>>();
+                    returnResult.data = currentBlobDict;
+                    returnResult.status = OperationResultStatus.success;
+
+                    resolve(returnResult);
+                }
             });
         });
     }

@@ -9,6 +9,7 @@ export { IBasicCache, IBasicTimedCache, IClearableCache, IBasicAsyncCache, IBasi
 export { ILogger } from './models/logger';
 export { IJsonParser, IJsonPropertyHandler, IJsonStringifier } from './models/json-serialization';
 export { IBlobStorageManager } from './models/blob-storage-manager';
+export { BlobInfo } from './models/blob-info';
 
 // Helpers
 export { ModelComparer } from './logic/helpers/modelcompare.helper';

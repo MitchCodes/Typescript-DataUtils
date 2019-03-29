@@ -21,6 +21,7 @@
     "no-trailing-whitespace": false,
     "ordered-imports": false,
     "prefer-template": false,
+    "no-floating-promises": false,
     "no-backbone-get-set-outside-model": false,
     "no-any": false,
     "no-unsafe-any": false,

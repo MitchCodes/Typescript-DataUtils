@@ -2,7 +2,7 @@
 import { AzureBlobStorageManager, AzureBlobOperationResult } from '../../src/data/azure-blob-storagemanager.logic';
 import * as winston from 'winston';
 import * as nconf from 'nconf';
-import { ModelComparer, IOperationResult, OperationResultStatus, BatchResultStatus, IOperationResultWithData } from 'tsdatautils-core';
+import { ModelComparer, IOperationResult, OperationResultStatus, BatchResultStatus, IOperationResultWithData, BlobInfo, Dictionary } from 'tsdatautils-core';
 import { TableQuery } from 'azure-storage';
 import * as moment from 'moment';
 import { Writable, Stream } from 'stream';
@@ -56,6 +56,7 @@ describe('azure-storage-manager-tests', () => {
                     testAccount: '',
                     testAccountKey: '',
                     testTable: 'unittests',
+                    testBlobContainer: 'testcontainer',
                 },
             },
         });
@@ -153,4 +154,24 @@ describe('azure-storage-manager-tests', () => {
             });
         });
     });
+
+    test('can query/get blobs', (done: any) => {
+        blobManager.createBlobFromFile(storageContainer, 'levelup5.mp3', './__tests__/levelup.mp3').then((res: IOperationResult) => {
+            blobManager.getBlobs(storageContainer).then((getRes: IOperationResultWithData<Dictionary<BlobInfo>>) => {
+                expect(getRes).not.toBeUndefined();
+                expect(getRes).not.toBeNull();
+                expect(getRes.data).not.toBeUndefined();
+                expect(getRes.data).not.toBeNull();
+
+                expect(Object.keys(getRes.data).length > 0).toBeTruthy();
+
+                expect(getRes.data['levelup5.mp3']).not.toBeUndefined();
+                expect(getRes.data['levelup5.mp3']).not.toBeNull();
+
+                done();
+            });
+        });
+    });
+
+    // azure takes time to delete containers so it makes it difficult to write a test for.
 });
