@@ -1,6 +1,6 @@
 {
   "name": "tsdatautils-memorycache",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "TypeScript classes for caching utilities from in memory",
   "engineStrict": true,
   "main": "./build/src/main.js",
