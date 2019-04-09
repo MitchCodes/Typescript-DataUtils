@@ -144,8 +144,8 @@ export class AzureBlobStorageManager implements IBlobStorageManager {
         });
     }
 
-    public getBlobToStream(container: string, blob: string, stream: Writable, options: BlobService.GetBlobRequestOptions = {}): Promise<IOperationResult> {
-        return new Promise<IOperationResult>((resolve: (val: IOperationResult) => void, reject: (reason: any) => void) => {
+    public getBlobToStream(container: string, blob: string, stream: Writable, options: BlobService.GetBlobRequestOptions = {}): Promise<IOperationResultWithData<BlobInfo>> {
+        return new Promise<IOperationResultWithData<BlobInfo>>((resolve: (val: IOperationResultWithData<BlobInfo>) => void, reject: (reason: any) => void) => {
             this.blobService.getBlobToStream(container, blob, stream, options, (err: Error, result: BlobService.BlobResult, response: ServiceResponse) => {
                 if (err !== undefined && err !== null) {
                     reject(err);
@@ -153,8 +153,31 @@ export class AzureBlobStorageManager implements IBlobStorageManager {
                     return;
                 }
     
-                let promiseResult: AzureBlobOperationResult<any> = new AzureBlobOperationResult();
+                let promiseResult: AzureBlobOperationResult<BlobInfo> = new AzureBlobOperationResult<BlobInfo>();
                 promiseResult.status = OperationResultStatus.success;
+
+                let blobInfo: BlobInfo = new BlobInfo();
+                blobInfo.contentLength = result.contentLength;
+                blobInfo.containerName = container;
+                if (result.contentSettings !== undefined && result.contentSettings !== null) {
+                    if (result.contentSettings.contentEncoding !== undefined && result.contentSettings.contentEncoding !== null) {
+                        blobInfo.contentEncoding = result.contentSettings.contentEncoding;
+                    }
+                    if (result.contentSettings.contentType !== undefined && result.contentSettings.contentType !== null) {
+                        blobInfo.contentType = result.contentSettings.contentType;
+                    }
+                }
+                blobInfo.creationTime = new Date(result.creationTime);
+                blobInfo.deleted = result.deleted;
+                if (result.deletedTime !== undefined && result.deletedTime !== null && result.deletedTime !== '') {
+                    blobInfo.deletedTime = new Date(result.deletedTime);
+                }
+                if (result.lastModified !== undefined && result.lastModified !== null && result.lastModified !== '') {
+                    blobInfo.lastModifiedTime = new Date(result.lastModified);
+                }
+                blobInfo.name = blob;
+
+                promiseResult.data = blobInfo;
     
                 resolve(promiseResult);
             });

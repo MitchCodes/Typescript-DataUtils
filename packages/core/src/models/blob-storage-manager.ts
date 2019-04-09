@@ -10,7 +10,7 @@ export interface IBlobStorageManager {
     createBlobFromFile(container: string, blob: string, filePath: string): Promise<IOperationResult>;
     createBlobWritingStream(container: string, blob: string): Promise<IOperationResultWithData<Writable>>;
     getBlobToFile(container: string, blob: string, outputFilePath: string): Promise<IOperationResult>;
-    getBlobToStream(container: string, blob: string, stream: Writable): Promise<IOperationResult>;
+    getBlobToStream(container: string, blob: string, stream: Writable): Promise<IOperationResultWithData<BlobInfo>>;
     deleteBlobIfExists(container: string, blob: string): Promise<IOperationResult>;
     getBlobs(container: string): Promise<IOperationResultWithData<Dictionary<BlobInfo>>>;
 }

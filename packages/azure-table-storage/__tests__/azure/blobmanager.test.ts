@@ -29,13 +29,11 @@ class BasicStream extends Stream.Writable {
     }
 
     public end(cb: Function = null): void {
-        if (cb !== null) {
-            cb();
-        }
-
         if (this.endCallback !== null) {
             this.endCallback();
         }
+
+        super.end(cb); // this took me hours to finally realize this needed to happen
     }
 }
 
@@ -110,14 +108,23 @@ describe('azure-storage-manager-tests', () => {
     });
 
     test('can get blob to stream', (done: any) => {
-        blobManager.createBlobFromFile(storageContainer, 'levelup2.mp3', './__tests__/levelup.mp3').then((res: IOperationResult) => {
+        blobManager.createBlobFromFile(storageContainer, 'levelup2.mp3', './__tests__/levelup.mp3').then((res: IOperationResult) => {            
             let getBlobStream: BasicStream = new BasicStream(() => {
                 console.debug('Total stream bytes: ' + getBlobStream.totalBytes);
-                expect(getBlobStream.totalBytes > 0).toBeTruthy();
-                done();
             });
     
-            blobManager.getBlobToStream(storageContainer, 'levelup2.mp3', getBlobStream);
+            blobManager.getBlobToStream(storageContainer, 'levelup2.mp3', getBlobStream).then((getRes: IOperationResultWithData<BlobInfo>) => {
+                console.info('Blob stream content length: ' + getRes.data.contentLength);
+                console.info('Blob stream content encoding: ' + getRes.data.contentEncoding);
+                setTimeout(() => {
+                    expect(getBlobStream.totalBytes > 0).toBeTruthy();
+                    expect(Number(getRes.data.contentLength) > 0).toBeTruthy();
+                    expect(getRes.data.contentType).not.toBeUndefined();
+                    expect(getRes.data.contentType).not.toBeNull();
+                    done();
+                // tslint:disable-next-line:align
+                }, 250);
+            });
         });        
     });
 
