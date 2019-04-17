@@ -1,4 +1,4 @@
-import * as winston from 'winston';
+import { Logger, createLogger, transports } from 'winston';
 import * as moment from 'moment';
 import { BasicMemoryCache } from '../../src/data/basic-memory-cache';
 import { IBasicCache, IBasicTimedCache, IClearableCache, ModelComparer } from 'tsdatautils-core';
@@ -26,7 +26,7 @@ describe('basic memory cache tests', () => {
     // Read more about fake timers: http://facebook.github.io/jest/docs/en/timer-mocks.html#content
     jest.useFakeTimers();
 
-    let logger: winston.LoggerInstance;
+    let logger: Logger;
     let testModel: CarTest;
 
     beforeAll(() => {
@@ -44,10 +44,10 @@ describe('basic memory cache tests', () => {
         testModel.engine = { isPowerful: true };
         testModel.classVersion = 1;
 
-        logger = new winston.Logger({
+        logger = createLogger({
             level: 'debug',
             transports: [
-              new (winston.transports.Console)(),
+              new transports.Console(),
             ],
           });
     });

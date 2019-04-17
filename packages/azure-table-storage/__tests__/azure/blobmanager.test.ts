@@ -1,6 +1,6 @@
 // tslint:disable:no-console no-require-imports no-var-requires
 import { AzureBlobStorageManager, AzureBlobOperationResult } from '../../src/data/azure-blob-storagemanager.logic';
-import * as winston from 'winston';
+import { Logger, createLogger, transports } from 'winston';
 import * as nconf from 'nconf';
 import { ModelComparer, IOperationResult, OperationResultStatus, BatchResultStatus, IOperationResultWithData, BlobInfo, Dictionary } from 'tsdatautils-core';
 import { TableQuery } from 'azure-storage';
@@ -38,7 +38,7 @@ class BasicStream extends Stream.Writable {
 }
 
 describe('azure-storage-manager-tests', () => {
-    let logger: winston.LoggerInstance;
+    let logger: Logger;
     let convObject: Object = null;
     let blobManager: AzureBlobStorageManager;
 
@@ -63,10 +63,10 @@ describe('azure-storage-manager-tests', () => {
         storageKey = nconf.get('test:azure:testAccountKey');
         storageContainer = nconf.get('test:azure:testBlobContainer');
 
-        logger = new winston.Logger({
+        logger = createLogger({
             level: 'debug',
             transports: [
-              new (winston.transports.Console)(),
+              new transports.Console(),
             ],
           });
 

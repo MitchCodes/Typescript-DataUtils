@@ -1,4 +1,3 @@
-import * as winston from 'winston';
 import * as nconf from 'nconf';
 import { BasicRedisCache } from '../../src/main';
 import { WinstonLogger, ModelComparer } from 'tsdatautils-core';
