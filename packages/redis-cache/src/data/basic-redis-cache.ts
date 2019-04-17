@@ -90,25 +90,25 @@ export class BasicRedisCache implements IBasicAsyncCache, IBasicAsyncTimedCache,
     private static registerClientEventHandlers(clientKey: string, redisClient: RedisClient, logger: ILogger, options: ClientOpts = {}): void {
         redisClient.on('connect', () => { 
             if (logger !== undefined && logger !== null) {
-                logger.logInfo('Redis ' + clientKey + ' connected.');
+                logger.info('Redis ' + clientKey + ' connected.');
             }
         });
 
         redisClient.on('ready', () => { 
             if (logger !== undefined && logger !== null) {
-                logger.logInfo('Redis ' + clientKey + ' ready.');
+                logger.info('Redis ' + clientKey + ' ready.');
             }
         });
 
         redisClient.on('reconnecting', () => { 
             if (logger !== undefined && logger !== null) {
-                logger.logInfo('Redis ' + clientKey + ' reconnecting.');
+                logger.info('Redis ' + clientKey + ' reconnecting.');
             }
         });
 
         redisClient.on('end', () => { 
             if (logger !== undefined && logger !== null) {
-                logger.logInfo('Redis ' + clientKey + ' ended.');
+                logger.info('Redis ' + clientKey + ' ended.');
             }
         });
 
@@ -118,7 +118,7 @@ export class BasicRedisCache implements IBasicAsyncCache, IBasicAsyncTimedCache,
     }
 
     private static handleError(err: any, logger: ILogger, clientKey: string, options: ClientOpts = {}): void {
-        logger.logError(err);
+        logger.error(err);
 
         BasicRedisCache.createClient(clientKey, options.port, options.host, options.password, options, logger);
     }

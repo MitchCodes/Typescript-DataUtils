@@ -76,12 +76,12 @@ describe('redis cache tests', () => {
       let basicRedisCache: BasicRedisCache = new BasicRedisCache(consoleLogger, 'main2', redisHost);
 
       let jsonStringBefore = JSON.stringify(testModel);
-      consoleLogger.logDebug('Before cached obj: ' + JSON.stringify(<any>testModel));
+      consoleLogger.debug('Before cached obj: ' + JSON.stringify(<any>testModel));
       // tslint:disable-next-line: no-floating-promises
       basicRedisCache.setItemAsync('test2', testModel).then((success: boolean) => {
         // tslint:disable-next-line: no-floating-promises
         basicRedisCache.getItemAsync<CarTest>('test2').then((val: CarTest) => {
-          consoleLogger.logDebug('Cached obj: ' + JSON.stringify(<any>val));
+          consoleLogger.debug('Cached obj: ' + JSON.stringify(<any>val));
           expect(val).not.toBeUndefined();
           expect(val).not.toBeNull();
 
