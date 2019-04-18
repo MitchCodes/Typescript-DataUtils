@@ -5,3 +5,5 @@ export { IAzureDocumentSavable, AzureDocumentResult,
         AzureDocumentTableCacheData, IAzureDocumentCache } from './data/azure-document-storagemanager.logic';
 
 export { AzureBlobOperationResult, AzureBlobStorageManager } from './data/azure-blob-storagemanager.logic';
+
+export { AzureApplicationInsightsWinstonTransport } from './data/applicationinsights-winston-transport';

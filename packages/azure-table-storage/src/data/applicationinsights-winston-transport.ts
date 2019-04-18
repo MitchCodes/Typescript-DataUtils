@@ -9,13 +9,16 @@ export class AzureApplicationInsightsWinstonTransport extends Transport {
     private loggerName: string = 'azure_appinsights_logger';
     private telemetryClient: TelemetryClient = null;
 
-    public constructor(sendErrorsAsExceptions: boolean = true, client: TelemetryClient = null, key: string = null, transportOptions: Transport.TransportStreamOptions = {}) {
+    public constructor(sendErrorsAsExceptions: boolean = true, client: TelemetryClient | string = null, transportOptions: Transport.TransportStreamOptions = {}) {
         super(transportOptions);
         this.sendErrorsAsExceptions = sendErrorsAsExceptions;
-        this.telemetryClient = client;
 
-        if (client === null && key !== null) {
-            this.setupClient(key);
+        if (client !== null) {
+            if (client instanceof TelemetryClient) {
+                this.telemetryClient = client;
+            } else {
+                this.setupClient(<string>client);
+            }
         }
     }
 

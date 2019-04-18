@@ -63,6 +63,18 @@
             "cwd": "${workspaceFolder}/packages/redis-cache",
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen"
+        },
+        {
+            "type": "node",
+            "name": "Application Insights Winston Jest Debug",
+            "request": "launch",
+            "program": "${workspaceFolder}/packages/azure-table-storage/node_modules/jest/bin/jest",
+            "args": [
+                "--runInBand", "--rootDir=./", "--config=./jest/jest.applicationinsights-winston.config.js"
+            ],
+            "cwd": "${workspaceFolder}/packages/azure-table-storage",
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen"
         }
     ]
 }

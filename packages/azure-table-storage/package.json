@@ -36,6 +36,7 @@
     "test-azure": "jest --rootDir=./ --config=./jest/jest.azure.config.js",
     "test-azure-table": "jest --rootDir=./ --config=./jest/jest.azuretable.config.js",
     "test-azure-blob": "jest --rootDir=./ --config=./jest/jest.azureblob.config.js",
+    "test-azure-appinsights-winston": "jest --rootDir=./ --config=./jest/jest.applicationinsights-winston.config.js",
     "publish-npm": "npm run clean && npm run build-prod && npm publish"
   },
   "author": "Mitch Chiles <mitchchiles@gmail.com>",
