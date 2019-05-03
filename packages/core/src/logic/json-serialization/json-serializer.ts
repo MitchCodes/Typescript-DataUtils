@@ -48,7 +48,7 @@ export class JsonSerializer implements IJsonStringifier, IJsonParser {
                 }
             }
 
-            if (propType === 'object') {
+            if (propType === 'object' && prop !== undefined && prop !== null) {
                 this.preStringifyForObjHandlers(prop);
             }
         }
@@ -72,8 +72,8 @@ export class JsonSerializer implements IJsonStringifier, IJsonParser {
                 }
             }
 
-            if (propType === 'object') {
-                this.preStringifyForObjHandlers(prop);
+            if (propType === 'object' && prop !== undefined && prop !== null) {
+                this.postStringifyForObjHandlers(prop);
             }
         }
     }
@@ -96,7 +96,7 @@ export class JsonSerializer implements IJsonStringifier, IJsonParser {
                 }
             }
 
-            if (propType === 'object') {
+            if (propType === 'object' && prop !== undefined && prop !== null) {
                 this.postParseForObjHandlers(prop);
             }
         }
