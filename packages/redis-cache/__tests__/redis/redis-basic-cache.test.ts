@@ -27,23 +27,27 @@ describe('redis cache tests', () => {
 
     let testModel: CarTest;
     let redisHost: string;
+    let redisPass: string;
     let consoleLogger: WinstonLogger;
     let carComparer: ModelComparer<CarTest>;
   
     // Act before assertions
     beforeAll(async () => {
       //jest.runOnlyPendingTimers();
+      nconf.defaults({
+          test: {
+              redis: {
+                  host: '127.0.0.1',
+                  pass: ''
+              },
+          },
+      });
 
       nconf.file({ file: './config.common.json' });
-      nconf.defaults({
-            test: {
-                redis: {
-                    host: '127.0.0.1',
-                },
-            },
-        });
+      
 
       redisHost = nconf.get('test:redis:host');
+      redisPass = nconf.get('test:redis:pass');
       consoleLogger = new WinstonLogger();
       carComparer = new ModelComparer<CarTest>();
 
@@ -63,8 +67,14 @@ describe('redis cache tests', () => {
 
     // tslint:disable-next-line:mocha-unneeded-done
     test('redis cache can connect and set an item', (done: any) => {
-      let basicRedisCache: BasicRedisCache = new BasicRedisCache(consoleLogger, 'main', redisHost);
-
+      let basicRedisCache: BasicRedisCache = null;
+      
+      if (redisPass) {
+        basicRedisCache = new BasicRedisCache(consoleLogger, 'main', redisHost, 6379, redisPass);
+      } else {
+        basicRedisCache = new BasicRedisCache(consoleLogger, 'main', redisHost, 6379);
+      }
+      
       // tslint:disable-next-line: no-floating-promises
       basicRedisCache.setItemAsync('test1', testModel).then((success: boolean) => {
         done();

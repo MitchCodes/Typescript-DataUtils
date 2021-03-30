@@ -75,6 +75,18 @@
             "cwd": "${workspaceFolder}/packages/azure-table-storage",
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen"
-        }
+        },
+        {
+            "type": "node",
+            "name": "Azure Queue Storage Jest Debug",
+            "request": "launch",
+            "program": "${workspaceFolder}/packages/azure-storage-queue/node_modules/jest/bin/jest",
+            "args": [
+                "--runInBand", "--rootDir=./", "--config=./jest/jest.azurestoragequeue.config.js"
+            ],
+            "cwd": "${workspaceFolder}/packages/azure-storage-queue",
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen"
+        },
     ]
 }

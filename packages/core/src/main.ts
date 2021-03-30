@@ -10,9 +10,13 @@ export { ILogger } from './models/logger';
 export { IJsonParser, IJsonPropertyHandler, IJsonStringifier } from './models/json-serialization';
 export { IBlobStorageManager } from './models/blob-storage-manager';
 export { BlobInfo } from './models/blob-info';
+export { IQueueStorageManager } from './models/queue-storage-manager';
+export { IQueueMessage, QueueMessageResult } from './models/queue-message';
+export { QueueMessageOptions } from './models/queue-message-options';
 
 // Helpers
 export { ModelComparer } from './logic/helpers/modelcompare.helper';
+export { ErrorHelper } from './logic/helpers/error.helper';
 
 // Loggers
 export { WinstonLogger } from './logic/loggers/winston-logger';
