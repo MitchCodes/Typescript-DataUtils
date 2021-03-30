@@ -1,6 +1,6 @@
 {
   "name": "tsdatautils-azurestoragequeue",
-  "version": "0.0.8",
+  "version": "0.0.81",
   "description": "TypeScript utilities for Azure Storage Queue",
   "engineStrict": true,
   "main": "./build/src/main.js",
