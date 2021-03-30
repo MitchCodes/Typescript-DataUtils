@@ -1,9 +1,7 @@
 import { IQueueMessage, QueueMessageOptions } from "tsdatautils-core";
 import { QueueMessage } from "../models/queue-message";
 import { gzip, ungzip } from 'node-gzip';
-import * as base64 from 'base-64';
 import { Base64 } from 'js-base64';
-import * as utf8 from 'utf8';
 
 export class QueueMessageConverter {
     public async convertToMessage<T>(input: T, options: QueueMessageOptions = null): Promise<IQueueMessage<T>> {

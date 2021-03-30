@@ -1,7 +1,7 @@
 {
-  "name": "tsdatautils-azurestoragequeue",
-  "version": "0.0.91",
-  "description": "TypeScript utilities for Azure Storage Queue",
+  "name": "tsdatautils-azurepubsub-servicebus",
+  "version": "0.0.93",
+  "description": "TypeScript utilities for Azure Pub-sub using service bus",
   "engineStrict": true,
   "main": "./build/src/main.js",
   "types": "./build/src/main.d.ts",
@@ -32,7 +32,7 @@
     "test-only": "jest --coverage",
     "test:watch": "jest --watch",
     "test-basic": "jest",
-    "test-azurestoragequeue": "jest --rootDir=./ --config=./jest/jest.azurestoragequeue.config.js",
+    "test-pubsub": "jest --rootDir=./ --config=./jest/jest.pubsub.config.js",
     "publish-npm": "npm run clean && npm run build-prod && npm publish"
   },
   "author": "Mitch Chiles <mitchchiles@gmail.com>",
@@ -45,14 +45,13 @@
   },
   "homepage": "https://github.com/MitchCodes/Typescript-DataUtils#about",
   "dependencies": {
-    "@azure/storage-queue": "~12.4.0",
+    "@azure/service-bus": "~7.0.3",
     "applicationinsights": "1.3.1",
-    "js-base64": "^3.6.0",
     "moment": "^2.24.0",
-    "node-gzip": "~1.1.2",
-    "tsdatautils-core": "0.0.9",
+    "tsdatautils-core": "0.0.93",
     "tslib": "~1.8.1",
     "winston": "3.2.1",
-    "winston-transport": "4.3.0"
+    "winston-transport": "4.3.0",
+    "js-base64": "~3.6.0"
   }
 }

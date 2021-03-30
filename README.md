@@ -34,12 +34,26 @@ For helper classes for Redis Cache, install the below package.
 npm install tsdatautils-rediscache
 ```
 
+```sh
+npm install tsdatautils-azurestoragequeue
+```
+
+For helper classes for Azure Service Bus Pub/Sub, install the below package.
+
+```sh
+npm install tsdatautils-azurepubsub-servicebus
+```
+
 ## Features
 
 Helper classes for:
 
 * Azure Table Storage
+* Azure Blob Storage
 * Redis Cache
+* In-memory cache
+* Azure Storage Queue
+* Azure Pub/sub using Service Bus Queues
 
 ## Development Notes
 

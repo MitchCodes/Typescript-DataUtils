@@ -88,5 +88,17 @@
             "console": "integratedTerminal",
             "internalConsoleOptions": "neverOpen"
         },
+        {
+            "type": "node",
+            "name": "Azure Service Bus Pubsub Jest Debug",
+            "request": "launch",
+            "program": "${workspaceFolder}/packages/azure-service-bus-pubsub/node_modules/jest/bin/jest",
+            "args": [
+                "--runInBand", "--rootDir=./", "--config=./jest/jest.pubsub.config.js"
+            ],
+            "cwd": "${workspaceFolder}/packages/azure-service-bus-pubsub",
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen"
+        },
     ]
 }
