@@ -18,7 +18,7 @@ export { IQueueStorageManager } from './models/queue-storage-manager';
 export { IQueueMessage, QueueMessageResult } from './models/queue-message';
 export { QueueMessageOptions } from './models/queue-message-options';
 
-export { IPubSubManager } from './models/pub-sub-manager';
+export { IPubSubManager, PubSubSubscriptionState, PubSubSubscriptionStatus } from './models/pub-sub-manager';
 export { IPubSubMessage, PubSubReceiveMessageResult } from './models/pub-sub-message';
 
 // Helpers

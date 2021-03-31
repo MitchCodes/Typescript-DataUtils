@@ -1,5 +1,5 @@
 import { ProcessErrorArgs, ServiceBusClient, ServiceBusMessage, ServiceBusReceivedMessage, ServiceBusReceiver, ServiceBusReceiverOptions, ServiceBusSender, SubscribeOptions } from "@azure/service-bus";
-import { ErrorHelper, IOperationResult, IPubSubManager, IPubSubMessage, PubSubReceiveMessageResult } from "tsdatautils-core";
+import { ErrorHelper, IOperationResult, IPubSubManager, IPubSubMessage, PubSubReceiveMessageResult, PubSubSubscriptionState, PubSubSubscriptionStatus } from "tsdatautils-core";
 import { PubSubMessageConverter } from "../converter/pubsub-message-converter";
 import { AzurePubsubDocumentResult } from "../models/pub-sub-result";
 
@@ -227,5 +227,39 @@ export class AzurePubSubServiceBusQueueManager implements IPubSubManager {
         this.serviceBusSubscribers = [];
 
         return;
+    }
+
+    public async getSubscriptionStatus(subscriberId: string): Promise<PubSubSubscriptionStatus> {
+        let subscriptionStatus: PubSubSubscriptionStatus = new PubSubSubscriptionStatus();
+        subscriptionStatus.state = PubSubSubscriptionState.Unknown;
+
+        if (!this.serviceBusSubscribers) {
+            this.serviceBusSubscribers = [];
+        }
+
+        let subscriberIndex: number = -1;
+        let foundSubscriber: AzurePubSubSubscriber = null;
+        for (let i = 0; i < this.serviceBusSubscribers.length; i++) {
+            let subscriber: AzurePubSubSubscriber = this.serviceBusSubscribers[i];
+            if (subscriber && subscriber.subscriptionId) {
+                if (subscriber.subscriptionId === subscriberId) {
+                    subscriberIndex = i;
+                    foundSubscriber = subscriber;
+                    break;
+                }
+            }
+        }
+
+        if (subscriberIndex === -1 || !foundSubscriber) {
+            return null;
+        }
+
+        if (foundSubscriber && foundSubscriber.subscriptionId && this.serviceBusClient && this.serviceBusReceiver && !this.serviceBusReceiver.isClosed) {
+            subscriptionStatus.state = PubSubSubscriptionState.Open;
+        } else if (foundSubscriber && foundSubscriber.subscriptionId) {
+            subscriptionStatus.state = PubSubSubscriptionState.Closed;
+        }
+
+        return subscriptionStatus;
     }
 }
