@@ -7,3 +7,5 @@ export { IAzureDocumentSavable, AzureDocumentResult,
 export { AzureBlobOperationResult, AzureBlobStorageManager } from './data/azure-blob-storagemanager.logic';
 
 export { AzureApplicationInsightsWinstonTransport } from './data/applicationinsights-winston-transport';
+
+export { GenericTableDocumentDataService } from './data/generictable-document.dataservice';
