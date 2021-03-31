@@ -1,6 +1,6 @@
 {
   "name": "tsdatautils-azuretablestorage",
-  "version": "0.0.9",
+  "version": "0.0.91",
   "description": "TypeScript utilities for Azure Table Storage",
   "engineStrict": true,
   "main": "./build/src/main.js",
