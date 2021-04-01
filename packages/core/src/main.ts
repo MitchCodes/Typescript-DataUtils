@@ -5,6 +5,7 @@ export { Dictionary } from './models/dictionary';
 export { BatchResultStatus, IBatchResult, IBatchResults } from './models/batch-result';
 export { ITableCache } from './models/table-cache';
 export { IDocumentStorageManager } from './models/document-storage-manager';
+export { Queue } from './models/queue';
 
 export { IBasicCache, IBasicTimedCache, IClearableCache, IBasicAsyncCache, IBasicAsyncTimedCache, IAsyncClearableCache } from './models/basic-cache';
 
@@ -18,8 +19,10 @@ export { IQueueStorageManager } from './models/queue-storage-manager';
 export { IQueueMessage, QueueMessageResult } from './models/queue-message';
 export { QueueMessageOptions } from './models/queue-message-options';
 
+export { QueuedCommandConcurrencyGroup, QueuedCommandJob } from './models/queued-command';
+
 export { IPubSubManager, PubSubSubscriptionState, PubSubSubscriptionStatus } from './models/pub-sub-manager';
-export { IPubSubMessage, PubSubReceiveMessageResult } from './models/pub-sub-message';
+export { IPubSubMessage, PubSubReceiveMessageResult, PubsubDocumentResult } from './models/pub-sub-message';
 
 // Helpers
 export { ModelComparer } from './logic/helpers/modelcompare.helper';
@@ -32,3 +35,11 @@ export { WinstonLogger } from './logic/loggers/winston-logger';
 export { JsonSerializer } from './logic/json-serialization/json-serializer';
 export { DateJsonPropertyHandler } from './logic/json-serialization/date-property-handler';
 export { UndefinedJsonPropertyHandler } from './logic/json-serialization/undefined-property-handler';
+
+
+// Logic / Data
+
+export { ClassFunctionThrottler } from './logic/class-function-throttler';
+export { ThrottledMemoryQueuePubSubManager } from './data/pubsub/throttled-memory-queue-pubsub-manager';
+
+export { QueuedCommandRunner, QueuedCommandRunnerEvents, QueuedCommandRunnerSettings } from './logic/queued-command-runner';

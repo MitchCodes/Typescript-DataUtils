@@ -1,9 +1,10 @@
 {
   "compilerOptions": {
     "target": "es6",
-    "module": "commonjs",
+    "module": "ES6",
     "moduleResolution": "node",
     "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
     "jsx": "react",
     "importHelpers": true,
     "alwaysStrict": true,
