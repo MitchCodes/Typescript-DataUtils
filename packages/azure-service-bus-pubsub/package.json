@@ -1,6 +1,6 @@
 {
   "name": "tsdatautils-azurepubsub-servicebus",
-  "version": "0.0.95",
+  "version": "0.1.2",
   "description": "TypeScript utilities for Azure Pub-sub using service bus",
   "engineStrict": true,
   "main": "./build/src/main.js",
