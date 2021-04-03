@@ -1,5 +1,6 @@
 import { Provider } from 'nconf';
 import { ILogger, IOperationResult, IOperationResultWithData, OperationResultStatus } from 'tsdatautils-core';
+import { TableStorageObjectConverter } from '../models/table-storage-object-converter';
 import { AzureDocumentResult, AzureDocumentStorageManager, IAzureDocumentSavable } from './azure-document-storagemanager.logic';
 
 // tslint:disable:max-line-length align
@@ -11,14 +12,14 @@ export class GenericTableDocumentDataService<T extends IAzureDocumentSavable> {
     protected azureTable: string = '';
     protected partitionKey: string = '';
 
-    public constructor(type: new () => T = null, configProvider: Provider = null, logger: ILogger = null, azureAcct: string = null, azureKey: string = null, azureTable: string = null, azureTablePartitionKey: string = null) {
+    public constructor(configProvider: Provider = null, logger: ILogger = null, type: new () => T = null, azureAcct: string = null, azureKey: string = null, azureTable: string = null, azureTablePartitionKey: string = null, converters: TableStorageObjectConverter[] = []) {
         this.configProvider = configProvider;
         this.logger = logger;
         this.azureTable = azureTable;
         this.partitionKey = azureTablePartitionKey;
 
         if (type && azureAcct && azureKey && azureTable && azureTablePartitionKey) {
-            this.azureStorageManager = new AzureDocumentStorageManager<T>(type, azureAcct, azureKey);
+            this.azureStorageManager = new AzureDocumentStorageManager<T>(type, azureAcct, azureKey, converters);
             this.azureStorageManager.initializeConnection();
         }
     }
