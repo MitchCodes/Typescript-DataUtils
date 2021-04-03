@@ -7,7 +7,18 @@ import * as nconf from 'nconf';
 import { ModelComparer, IOperationResult, OperationResultStatus, BatchResultStatus } from 'tsdatautils-core';
 import { TableQuery } from 'azure-storage';
 import * as moment from 'moment';
+import { TableStorageArrayConverter, TableStorageObjectTypeConverter } from '../../src/main';
 jest.mock('../../src/data/azure-document-storagemanager.logic');
+
+export class CarLog {
+    public time: number;
+    public log: string;
+
+    public constructor(time: number = 0, log: string = '') {
+        this.time = time;
+        this.log = log;
+    }
+}
 
 export class CarTest implements IAzureDocumentSavable {
     public partitionKey: string;
@@ -22,6 +33,9 @@ export class CarTest implements IAzureDocumentSavable {
     public tireName: string;
     public engine: Object;
     public isOn: boolean;
+
+    public logs: CarLog[];
+
     public turnOn() {
         this.isOn = true;
     }
@@ -77,6 +91,8 @@ describe('azure-storage-manager-tests', () => {
         testModel.engine = { isPowerful: true };
         testModel.classVersion = 1;
 
+        testModel.logs = [new CarLog(123, 'test'), new CarLog(456, 'test 2')];
+
         logger = createLogger({
             level: 'debug',
             transports: [
@@ -87,6 +103,7 @@ describe('azure-storage-manager-tests', () => {
         logger.info('Account: ' + storageAcct);
 
         testModelManager = new AzureDocumentStorageManager<CarTest>(CarTest);
+        testModelManager.converters = [new TableStorageObjectTypeConverter(), new TableStorageArrayConverter()]
         convObject = testModelManager.convertToAzureObj(testModel);
         convertedTestModel = testModelManager.convertFromObjToType(testModelManager.convertFromAzureObjToObject(convObject));
 

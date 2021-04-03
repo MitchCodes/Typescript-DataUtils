@@ -139,45 +139,45 @@ describe('json serializer tests', () => {
       jobFinished = true;
     });
 
-    queuedCommandRunner.addJob(new QueuedCommandJob(async () => {
+    queuedCommandRunner.addJob(new QueuedCommandJob('test', async () => {
       await sleep(3000);
     }));
 
     for (let i = 0; i < 10; i++) {
-      queuedCommandRunner.addJob(new QueuedCommandJob(async () => {
+      queuedCommandRunner.addJob(new QueuedCommandJob('test', async () => {
         await sleep(1500);
       }, 'test', 4));
     }
 
-    queuedCommandRunner.addJob(new QueuedCommandJob(async () => {
+    queuedCommandRunner.addJob(new QueuedCommandJob('test', async () => {
       await sleep(3000);
     }))
 
-    queuedCommandRunner.addJob(new QueuedCommandJob(async () => {
+    queuedCommandRunner.addJob(new QueuedCommandJob('test', async () => {
       await sleep(3000);
       throw new Error('test error');
     }))
 
     for (let i = 0; i < 2; i++) {
-      queuedCommandRunner.addJob(new QueuedCommandJob(async () => {
+      queuedCommandRunner.addJob(new QueuedCommandJob('test', async () => {
         await sleep(1500);
       }, 'test', 4));
     }
 
     for (let i = 0; i < 2; i++) {
-      queuedCommandRunner.addJob(new QueuedCommandJob(async () => {
+      queuedCommandRunner.addJob(new QueuedCommandJob('test', async () => {
         await sleep(1500);
       }, 'test2', 4));
     }
 
     for (let i = 0; i < 2; i++) {
-      queuedCommandRunner.addJob(new QueuedCommandJob(async () => {
+      queuedCommandRunner.addJob(new QueuedCommandJob('test', async () => {
         await sleep(1500);
       }, 'test', 4));
     }
 
     for (let i = 0; i < 2; i++) {
-      queuedCommandRunner.addJob(new QueuedCommandJob(async () => {
+      queuedCommandRunner.addJob(new QueuedCommandJob('test', async () => {
         await sleep(1500);
       }, 'test2', 4));
     }

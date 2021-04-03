@@ -2,6 +2,7 @@ import { TableService, ErrorOrResult, TableUtilities, ExponentialRetryPolicyFilt
     createTableService, TableQuery, TableBatch } from 'azure-storage';
 import * as moment from 'moment';
 import { DocumentIdentifier, IOperationResult, OperationResultStatus, Dictionary, IDocumentStorageManager, BatchResultStatus, IBatchResult, IBatchResults, ITableCache, BasicDocumentIdentifier, IOperationResultWithData } from 'tsdatautils-core';
+import { TableStorageObjectConverter } from '../models/table-storage-object-converter';
 
 export interface IAzureDocumentSavable {
     partitionKey: string;
@@ -102,12 +103,16 @@ export class AzureDocumentStorageManager<T extends IAzureDocumentSavable> implem
     private maxBatchNumber: number = 50;
     private cache: IAzureDocumentCache<T> = null;
 
+    public converters: TableStorageObjectConverter[] = [];
+
     public constructor(testType: new () => T, azureStorageAccount: string = '', 
-                       azureStorageKey: string = '', overrideTableService: TableService = null) {
+                       azureStorageKey: string = '', converters: TableStorageObjectConverter[] = [], overrideTableService: TableService = null) {
         this.testType = testType;
         this.azureStorageAccount = azureStorageAccount;
         this.azureStorageKey = azureStorageKey;
         this.overrideTableService = overrideTableService;
+
+        this.converters = converters;
 
         if (overrideTableService !== null) {
             this.tblService = overrideTableService;
@@ -650,37 +655,48 @@ export class AzureDocumentStorageManager<T extends IAzureDocumentSavable> implem
         return result;
     }
 
-    private convertToAzureObj(obj: T): Object {
+    private convertToAzureObj(obj: any): Object {
         let entGen = TableUtilities.entityGenerator;
         let returnObj: Object = {};
-        let objectKeys: string[] = Object.keys(obj);
+
+        let clonedObj: any = Object.assign({}, obj);
+        let convertedObj: any = clonedObj;
+        if (this.converters) {
+            for (let converter of this.converters) {
+                if (converter) {
+                    convertedObj = converter.convertToAzure(convertedObj);
+                }
+            }
+        }
+
+        let objectKeys: string[] = Object.keys(convertedObj);
         // tslint:disable-next-line:no-string-literal
-        returnObj['PartitionKey'] = entGen.String(obj.partitionKey);
+        returnObj['PartitionKey'] = entGen.String(convertedObj.partitionKey);
         // tslint:disable-next-line:no-string-literal
-        returnObj['RowKey'] = entGen.String(obj.rowKey);
+        returnObj['RowKey'] = entGen.String(convertedObj.rowKey);
         for (let key of objectKeys) {
             if (key === 'partitionKey' || key === 'rowKey') {
                 continue;
             }
-            let keyType = typeof obj[key];
+            let keyType = typeof convertedObj[key];
             if (keyType === 'function' || keyType === 'symbol' || keyType === 'undefined') {
                 continue;
             } else if (keyType === 'object') {
-                if (obj[key] instanceof Date) {
-                    returnObj[key] = entGen.DateTime(<Date>obj[key]);
+                if (convertedObj[key] instanceof Date) {
+                    returnObj[key] = entGen.DateTime(<Date>convertedObj[key]);
                 } else {
                     continue;
                 }
             } else if (keyType === 'boolean') {
-                returnObj[key] = entGen.Boolean(obj[key]);
+                returnObj[key] = entGen.Boolean(convertedObj[key]);
             } else if (keyType === 'number') {
-                if (Number.isSafeInteger(obj[key])) {
-                    returnObj[key] = entGen.Int64(obj[key]);
+                if (Number.isSafeInteger(convertedObj[key])) {
+                    returnObj[key] = entGen.Int64(convertedObj[key]);
                 } else {
-                    returnObj[key] = entGen.Double(obj[key]);
+                    returnObj[key] = entGen.Double(convertedObj[key]);
                 }
             } else if (keyType === 'string') {
-                returnObj[key] = entGen.String(obj[key]);
+                returnObj[key] = entGen.String(convertedObj[key]);
             } else {
                 continue;
             }
@@ -737,6 +753,14 @@ export class AzureDocumentStorageManager<T extends IAzureDocumentSavable> implem
                     returnObj[key] = azureObj[key]._;
             }
             
+        }
+
+        if (this.converters) {
+            for (let converter of this.converters) {
+                if (converter) {
+                    returnObj = converter.convertFromAzure(returnObj);
+                }
+            }
         }
 
         return returnObj;
