@@ -1,16 +1,27 @@
 import { Provider } from 'nconf';
-import { Logger, createLogger, transports } from 'winston';
-import { IOperationResult, IOperationResultWithData, OperationResultStatus } from 'tsdatautils-core';
+import { ILogger, IOperationResult, IOperationResultWithData, OperationResultStatus } from 'tsdatautils-core';
 import { AzureDocumentResult, AzureDocumentStorageManager, IAzureDocumentSavable } from './azure-document-storagemanager.logic';
 
 // tslint:disable:max-line-length align
 export class GenericTableDocumentDataService<T extends IAzureDocumentSavable> {
 
     protected configProvider: Provider;
-    protected logger: Logger;
+    protected logger: ILogger;
     protected azureStorageManager: AzureDocumentStorageManager<T>;
     protected azureTable: string = '';
     protected partitionKey: string = '';
+
+    public constructor(type: new () => T = null, configProvider: Provider = null, logger: ILogger = null, azureAcct: string = null, azureKey: string = null, azureTable: string = null, azureTablePartitionKey: string = null) {
+        this.configProvider = configProvider;
+        this.logger = logger;
+        this.azureTable = azureTable;
+        this.partitionKey = azureTablePartitionKey;
+
+        if (type && azureAcct && azureKey && azureTable && azureTablePartitionKey) {
+            this.azureStorageManager = new AzureDocumentStorageManager<T>(type, azureAcct, azureKey);
+            this.azureStorageManager.initializeConnection();
+        }
+    }
 
     protected processEntityBeforeSave(entity: T): void {
 
