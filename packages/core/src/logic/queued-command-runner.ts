@@ -225,6 +225,11 @@ export class QueuedCommandRunner extends EventEmitter {
                 this.pendingJobs.push(pendingJob);
 
                 await pendingJob.jobPromise;
+
+                let pendingJobsIndex: number = this.pendingJobs.indexOf(pendingJob);
+                if (pendingJobsIndex !== -1) {
+                    this.pendingJobs.splice(pendingJobsIndex, 1);
+                }
                 
                 return pendingJob;
             });
