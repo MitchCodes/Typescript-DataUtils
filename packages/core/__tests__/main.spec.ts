@@ -1,10 +1,12 @@
 import { ThrottledMemoryQueuePubSubManager } from '../src/data/pubsub/throttled-memory-queue-pubsub-manager';
+import { ClassFunctionDistributorCreator, RoundRobinClassFunctionDistributorAlgorithm } from '../src/logic/class-function-distributor';
 import { ClassFunctionThrottler } from '../src/logic/class-function-throttler';
 import { ModelComparer } from '../src/logic/helpers/modelcompare.helper';
 import { DateJsonPropertyHandler } from '../src/logic/json-serialization/date-property-handler';
 import { JsonSerializer } from '../src/logic/json-serialization/json-serializer';
 import { UndefinedJsonPropertyHandler } from '../src/logic/json-serialization/undefined-property-handler';
 import { QueuedCommandRunner } from '../src/logic/queued-command-runner';
+import { IClassFunctionDistributor } from '../src/main';
 import { PubSubReceiveMessageResult } from '../src/models/pub-sub-message';
 import { QueuedCommandJob } from '../src/models/queued-command';
 
@@ -47,6 +49,10 @@ export class CarService {
 
   public getCarTireName(car: CarTest): string {
     return car.tireName;
+  }
+
+  public getSomeField(): string {
+    return this.someField;
   }
 }
 
@@ -110,6 +116,31 @@ describe('json serializer tests', () => {
     expect(carCompareHelper.propertiesAreEqualToFirst(testModel, parsedThree)).toBeTruthy();
   });
 
+  test('expect round robin to work', async (done) => {
+    let carServiceOne: CarService = new CarService();
+    carServiceOne.someField = 'one';
+
+    let carServiceTwo: CarService = new CarService();
+    carServiceTwo.someField = 'two';
+
+    let carServiceThree: CarService = new CarService();
+    carServiceThree.someField = 'three';
+
+    let roundRobinDistributor: ClassFunctionDistributorCreator = new ClassFunctionDistributorCreator();
+    let distributedCarService: CarService & IClassFunctionDistributor<CarService> = roundRobinDistributor.getDistributedObject<CarService>([carServiceOne, carServiceTwo, carServiceThree], new RoundRobinClassFunctionDistributorAlgorithm());
+    
+    let someFieldOne: string = distributedCarService.getSomeField();
+    let someFieldTwo: string = distributedCarService.getSomeField();
+    let someFieldThree: string = distributedCarService.getSomeField();
+    let someFieldFour: string = distributedCarService.getSomeField();
+
+    expect(someFieldOne === 'one').toBeTruthy();
+    expect(someFieldTwo === 'two').toBeTruthy();
+    expect(someFieldThree === 'three').toBeTruthy();
+    expect(someFieldFour === 'one').toBeTruthy();
+
+    done();
+  });
   
   test('expect queued command runner to work', async (done) => {
     let queuedCommandRunner: QueuedCommandRunner = new QueuedCommandRunner();

@@ -24,9 +24,12 @@ export { QueuedCommandConcurrencyGroup, QueuedCommandJob } from './models/queued
 export { IPubSubManager, PubSubSubscriptionState, PubSubSubscriptionStatus } from './models/pub-sub-manager';
 export { IPubSubMessage, PubSubReceiveMessageResult, PubsubDocumentResult } from './models/pub-sub-message';
 
+export { IClassFunctionDistributor, IClassFunctionDistributorCreator, IClassFunctionDistributorAlgorithm } from './models/class-function-distribute';
+
 // Helpers
 export { ModelComparer } from './logic/helpers/modelcompare.helper';
 export { ErrorHelper } from './logic/helpers/error.helper';
+export { FunctionHelper } from './logic/helpers/function.helper';
 
 // Loggers
 export { WinstonLogger, WinstonDateStampFormatModifier, WinstonDateStampModifier, WinstonDateStampType, WinstonInterpolateModifier, WinstonLogMessageModifier } from './logic/loggers/winston-logger';
@@ -38,8 +41,8 @@ export { UndefinedJsonPropertyHandler } from './logic/json-serialization/undefin
 
 
 // Logic / Data
-
+export { ClassFunctionDistributorCreator, RoundRobinClassFunctionDistributorAlgorithm, RandomClassFunctionDistributorAlgorithm } from './logic/class-function-distributor';
 export { ClassFunctionThrottler } from './logic/class-function-throttler';
 export { ThrottledMemoryQueuePubSubManager } from './data/pubsub/throttled-memory-queue-pubsub-manager';
 
-export { QueuedCommandRunner, QueuedCommandRunnerEvents, QueuedCommandRunnerSettings } from './logic/queued-command-runner';
+export { QueuedCommandRunner, QueuedCommandRunnerEvents, QueuedCommandRunnerSettings, PendingJob } from './logic/queued-command-runner';

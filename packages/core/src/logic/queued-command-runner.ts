@@ -29,9 +29,10 @@ export declare interface QueuedCommandRunner {
     ): boolean;
 }
 
-class PendingJob {
+export class PendingJob {
     public job: QueuedCommandJob;
     public jobPromise: Promise<void>;
+    public jobPromiseResolver: () => void;
     public error: Error;
 
     public constructor(job: QueuedCommandJob = null, error: Error = null, jobPromise: Promise<void> = null) {
@@ -216,15 +217,16 @@ export class QueuedCommandRunner extends EventEmitter {
             await this.waitForPendingJobsToFinish();
             this.concurrentQueue = cq.default();
             this.concurrentQueue.limit({concurrency: job.concurrencyGroup.maxConcurrent});
-            this.concurrentQueueProcessFn = this.concurrentQueue.process(async (queuedJob: QueuedCommandJob) => {
-                let pendingJob: PendingJob = this.startJob(queuedJob);
-                if (!this.pendingJobs) {
-                    this.pendingJobs = [];
-                }
-    
-                this.pendingJobs.push(pendingJob);
+            this.concurrentQueueProcessFn = this.concurrentQueue.process(async (pendingJob: PendingJob) => {
+                let queuedJob: QueuedCommandJob = pendingJob.job;
+                await queuedJob.doWork().then(() => {
+                    this.emit('finishJob', job);
 
-                await pendingJob.jobPromise;
+                    if (pendingJob.jobPromiseResolver) {
+                        pendingJob.jobPromiseResolver();
+                    }
+                    return;
+                });
 
                 let pendingJobsIndex: number = this.pendingJobs.indexOf(pendingJob);
                 if (pendingJobsIndex !== -1) {
@@ -235,7 +237,19 @@ export class QueuedCommandRunner extends EventEmitter {
             });
         }
 
-        this.concurrentQueue(job).then((pendingJob: PendingJob) => {
+        if (!this.pendingJobs) {
+            this.pendingJobs = [];
+        }
+
+        let pendingJob: PendingJob = new PendingJob();
+        pendingJob.job = job;
+        pendingJob.jobPromise = new Promise<void>((resolve : () => void) => {
+            pendingJob.jobPromiseResolver = resolve;
+        });
+
+        this.pendingJobs.push(pendingJob);
+
+        this.concurrentQueue(pendingJob).then((pendingJob: PendingJob) => {
             this.emit('queueProcessed', pendingJob);
         });
 
