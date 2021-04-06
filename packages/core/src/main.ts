@@ -29,7 +29,7 @@ export { ModelComparer } from './logic/helpers/modelcompare.helper';
 export { ErrorHelper } from './logic/helpers/error.helper';
 
 // Loggers
-export { WinstonLogger } from './logic/loggers/winston-logger';
+export { WinstonLogger, WinstonDateStampFormatModifier, WinstonDateStampModifier, WinstonDateStampType, WinstonInterpolateModifier, WinstonLogMessageModifier } from './logic/loggers/winston-logger';
 
 // Json Serialization
 export { JsonSerializer } from './logic/json-serialization/json-serializer';
