@@ -9,6 +9,14 @@ export interface QueuedCommandRunnerEvents {
     'queueProcessed': (job: PendingJob) => void;
     'startJob': (job: QueuedCommandJob) => void;
     'finishJob': (job: QueuedCommandJob) => void;
+    'waitingForJobsToFinish': (pendingJobs: PendingJob[]) => void;
+    'doneWaitingForJobsToFinish': () => void;
+    'starting': () => void;
+    'started': () => void;
+    'stopping': () => void;
+    'stopped': () => void;
+    'cleaningUp': () => void;
+    'cleanedUp': () => void;
 }
 
 export declare interface QueuedCommandRunner {
@@ -75,10 +83,12 @@ export class QueuedCommandRunner extends EventEmitter {
     }
 
     public start(): void {
+        this.emit('starting');
         this.processing = true;
         
         if (!this.jobHandler) {
             this.jobHandler = setTimeout(() => {
+                this.emit('started');
                 this.handleJobs();
             }, this.settings.timeoutWorkingMs);
         }
@@ -90,7 +100,9 @@ export class QueuedCommandRunner extends EventEmitter {
 
     private async handleJobs(): Promise<void> {
         if (!this.processing) {
+            this.emit('stopping');
             await this.cleanup();
+            this.emit('stopped');
             return;
         }
 
@@ -107,6 +119,7 @@ export class QueuedCommandRunner extends EventEmitter {
     }
 
     private async cleanup(): Promise<void> {
+        this.emit('cleaningUp');
         await this.waitForPendingJobsToFinish();
 
         this.pendingJobs = [];
@@ -114,6 +127,7 @@ export class QueuedCommandRunner extends EventEmitter {
         this.concurrentQueue = null;
         this.concurrentQueueProcessFn = null;
         this.jobHandler = null;
+        this.emit('cleanedUp');
     }
 
     // Promise resolves once the next job is handled (true for no more jobs, false for more jobs)
@@ -178,6 +192,8 @@ export class QueuedCommandRunner extends EventEmitter {
             return;
         }
 
+        this.emit('waitingForJobsToFinish', this.pendingJobs);
+
         let jobPromises: Promise<void>[] = [];
         for (let pendingJob of this.pendingJobs) {
             jobPromises.push(pendingJob.jobPromise);
@@ -185,6 +201,7 @@ export class QueuedCommandRunner extends EventEmitter {
 
         try {
             await Promise.all(jobPromises);
+            this.emit('doneWaitingForJobsToFinish');
         } catch (err) {
             this.emit('error', ErrorHelper.isError(err) ? err : new Error(err));
         }
