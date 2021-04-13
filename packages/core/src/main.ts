@@ -43,6 +43,7 @@ export { UndefinedJsonPropertyHandler } from './logic/json-serialization/undefin
 // Logic / Data
 export { ClassFunctionDistributorCreator, RoundRobinClassFunctionDistributorAlgorithm, RandomClassFunctionDistributorAlgorithm } from './logic/class-function-distributor';
 export { ClassFunctionThrottler } from './logic/class-function-throttler';
+export { ClassFunctionRetrier } from './logic/class-function-retrier';
 export { ThrottledMemoryQueuePubSubManager } from './data/pubsub/throttled-memory-queue-pubsub-manager';
 
 export { QueuedCommandRunner, QueuedCommandRunnerEvents, QueuedCommandRunnerSettings, PendingJob } from './logic/queued-command-runner';

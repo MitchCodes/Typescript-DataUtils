@@ -6,7 +6,7 @@ import { DateJsonPropertyHandler } from '../src/logic/json-serialization/date-pr
 import { JsonSerializer } from '../src/logic/json-serialization/json-serializer';
 import { UndefinedJsonPropertyHandler } from '../src/logic/json-serialization/undefined-property-handler';
 import { QueuedCommandRunner } from '../src/logic/queued-command-runner';
-import { IClassFunctionDistributor } from '../src/main';
+import { ClassFunctionRetrier, IClassFunctionDistributor } from '../src/main';
 import { PubSubReceiveMessageResult } from '../src/models/pub-sub-message';
 import { QueuedCommandJob } from '../src/models/queued-command';
 
@@ -35,6 +35,8 @@ export class CarTest {
 
 export class CarService {
   public someField: string = 'lol';
+  public timesFailed: number = 0;
+  public timesFailedAsync: number = 0;
   
   public async getCar(tireName: string, model: string, uselessInput: number): Promise<CarTest> {
     let carTest: CarTest = new CarTest();
@@ -53,6 +55,32 @@ export class CarService {
 
   public getSomeField(): string {
     return this.someField;
+  }
+
+  public getSomeFieldWithFailNumber(): string {
+    if (this.timesFailed < 2) {
+      this.timesFailed = this.timesFailed + 1;
+      throw new Error('blah some crappy error');
+    }
+
+    return this.someField;
+  }
+
+  public async getSomeFieldWithFailNumberAsync(): Promise<string> {
+    if (this.timesFailedAsync < 2) {
+      this.timesFailedAsync = this.timesFailedAsync + 1;
+      throw new Error('blah some crappy error');
+    }
+
+    return this.someField;
+  }
+
+  public getSomeFieldAlwaysFails(): string {
+    throw new Error('this code sucks');
+  }
+
+  public async getSomeFieldAlwaysFailsAsync(): Promise<string> {
+    throw new Error('this code sucks');
   }
 }
 
@@ -114,6 +142,57 @@ describe('json serializer tests', () => {
     let parsedThree: CarTest = jsonSerializer.parse(serializedThree);
 
     expect(carCompareHelper.propertiesAreEqualToFirst(testModel, parsedThree)).toBeTruthy();
+  });
+
+  test('expect retry logic to work', async (done) => {
+    let carServiceOne: CarService = new CarService();
+    carServiceOne.someField = 'one';
+
+    let classFunctionRetrier: ClassFunctionRetrier = new ClassFunctionRetrier();
+    let retriedCarService: CarService = classFunctionRetrier.getRetryableClass<CarService>(carServiceOne, 3);
+    let retriedCarServiceAsync: CarService = classFunctionRetrier.getRetryableClassAsync<CarService>(carServiceOne, 3);
+
+    let someFieldOne: string = retriedCarService.getSomeFieldWithFailNumber();
+    let someFieldTwo: string = await retriedCarServiceAsync.getSomeFieldWithFailNumberAsync();
+
+    expect(someFieldOne === 'one').toBeTruthy();
+    expect(someFieldTwo === 'one').toBeTruthy();
+
+    expect(carServiceOne.timesFailed === 2).toBeTruthy();
+    expect(carServiceOne.timesFailedAsync === 2).toBeTruthy();
+
+    let errorHappened: boolean = false;
+    try {
+      retriedCarService.getSomeFieldAlwaysFails();
+    } catch (err) {
+      errorHappened = true;
+    }
+
+    let errorHappenedAsync: boolean = false;
+    try {
+      await retriedCarService.getSomeFieldAlwaysFailsAsync();
+    } catch (err) {
+      errorHappenedAsync = true;
+    }
+
+    expect(errorHappened).toBeTruthy();
+    expect(errorHappenedAsync).toBeTruthy();
+
+    let retriedCarServiceWithBlahReturn: CarService = classFunctionRetrier.getRetryableClass<CarService>(carServiceOne, 3, (error: any, functionName: string): any => {
+      return 'blah';
+    });
+
+    let retriedCarServiceWithBlahReturnAsync: CarService = classFunctionRetrier.getRetryableClassAsync<CarService>(carServiceOne, 3, (error: any, functionName: string): any => {
+      return 'blah';
+    });
+
+    let someFieldOneBlah: string = retriedCarServiceWithBlahReturn.getSomeFieldAlwaysFails();
+    let someFieldTwoBlah: string = await retriedCarServiceWithBlahReturnAsync.getSomeFieldAlwaysFailsAsync();
+
+    expect(someFieldOneBlah === 'blah').toBeTruthy();
+    expect(someFieldTwoBlah === 'blah').toBeTruthy();
+
+    done();
   });
 
   test('expect round robin to work', async (done) => {
