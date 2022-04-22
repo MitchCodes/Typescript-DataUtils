@@ -21,7 +21,7 @@
     "typescript": "~2.6.2",
     "ts-jest": "~22.4.1",
     "winston-daily-rotate-file": "3.8.0",
-    "nconf": "~0.10.0"
+    "nconf": "~0.11.4"
   },
   "scripts": {
     "clean": "rimraf coverage build tmp logs",
