@@ -1,4 +1,5 @@
 module.exports = {
+  preset: 'ts-jest',
   testEnvironment: 'node',
   transform: {
     '.(ts|tsx)': 'ts-jest'
@@ -16,9 +17,7 @@ module.exports = {
     'src/**/*.{ts,tsx,js,jsx}',
     '!src/**/*.d.ts',
   ],
-  globals: {
-    "ts-jest": {
-      "skipBabel": true
-    }
-  }
+  transformIgnorePatterns: [
+    'node_modules/(?!(.*\\.mjs$))'
+  ]
 };

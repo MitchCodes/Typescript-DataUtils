@@ -10,7 +10,7 @@ export class AzureQueueDocumentResult implements IOperationResult {
     }
 
     public static buildSimpleError<T>(errorString: string, errorObj: Error = null): AzureQueueDocumentResult {
-        let azureRes: AzureQueueDocumentResult = new this();
+        const azureRes: AzureQueueDocumentResult = new this();
         azureRes.status = OperationResultStatus.error;
         azureRes.message = errorString;
 
@@ -24,7 +24,7 @@ export class AzureQueueDocumentResult implements IOperationResult {
     }
 
     public static buildSuccess<T>(): AzureQueueDocumentResult {
-        let azureRes: AzureQueueDocumentResult = new this();
+        const azureRes: AzureQueueDocumentResult = new this();
         azureRes.status = OperationResultStatus.success;
 
         return azureRes;
@@ -43,7 +43,7 @@ export class AzureQueueDocumentResultWithData<T> implements QueueMessageResult<T
     }
 
     public static buildSimpleError<T>(errorString: string, errorObj: Error = null): AzureQueueDocumentResultWithData<T> {
-        let azureRes: AzureQueueDocumentResultWithData<T> = new this();
+        const azureRes: AzureQueueDocumentResultWithData<T> = new this();
         azureRes.status = OperationResultStatus.error;
         azureRes.message = errorString;
 
@@ -57,7 +57,7 @@ export class AzureQueueDocumentResultWithData<T> implements QueueMessageResult<T
     }
 
     public static buildSuccess<T>(data: T): AzureQueueDocumentResultWithData<T> {
-        let azureRes: AzureQueueDocumentResultWithData<T> = new this();
+        const azureRes: AzureQueueDocumentResultWithData<T> = new this();
         azureRes.status = OperationResultStatus.success;
         azureRes.data = data;
 

@@ -23,8 +23,8 @@ export class AzureQueueStorageManager implements IQueueStorageManager {
         let result: IOperationResult = AzureQueueDocumentResult.buildSuccess();
 
         try {
-            let queueClient: QueueClient = await this.queueServiceClient.getQueueClient(queueName);
-            let response: QueueCreateIfNotExistsResponse = await queueClient.createIfNotExists();
+            const queueClient: QueueClient = await this.queueServiceClient.getQueueClient(queueName);
+            const response: QueueCreateIfNotExistsResponse = await queueClient.createIfNotExists();
         } catch (err) {
             result = AzureQueueDocumentResult.buildSimpleError('Error creating queue: ' + err, ErrorHelper.isError(err) ? err : new Error(err));
         }
@@ -40,13 +40,13 @@ export class AzureQueueStorageManager implements IQueueStorageManager {
         }
 
         try {
-            let queueClient: QueueClient = await this.queueServiceClient.getQueueClient(queueName);
+            const queueClient: QueueClient = await this.queueServiceClient.getQueueClient(queueName);
 
-            let messageConverter: QueueMessageConverter = new QueueMessageConverter();
-            let queueMessage: IQueueMessage<T> = await messageConverter.convertToMessage<T>(message, options);
+            const messageConverter: QueueMessageConverter = new QueueMessageConverter();
+            const queueMessage: IQueueMessage<T> = await messageConverter.convertToMessage<T>(message, options);
 
-            let queueMessageStringified: string = JSON.stringify(queueMessage);
-            let response: QueueSendMessageResponse = await queueClient.sendMessage(queueMessageStringified);
+            const queueMessageStringified: string = JSON.stringify(queueMessage);
+            const response: QueueSendMessageResponse = await queueClient.sendMessage(queueMessageStringified);
         } catch (err) {
             result = AzureQueueDocumentResult.buildSimpleError('Error adding message: ' + err, ErrorHelper.isError(err) ? err : new Error(err));
         }
@@ -59,18 +59,18 @@ export class AzureQueueStorageManager implements IQueueStorageManager {
         result.data = null;
 
         try {
-            let queueClient: QueueClient = await this.queueServiceClient.getQueueClient(queueName);
+            const queueClient: QueueClient = await this.queueServiceClient.getQueueClient(queueName);
 
-            let response: QueueReceiveMessageResponse = await queueClient.receiveMessages();
+            const response: QueueReceiveMessageResponse = await queueClient.receiveMessages();
             if (response && response.receivedMessageItems && response.receivedMessageItems.length > 0) {
-                let firstItem: DequeuedMessageItem = response.receivedMessageItems[0];
-                let itemString: string = firstItem.messageText;
+                const firstItem: DequeuedMessageItem = response.receivedMessageItems[0];
+                const itemString: string = firstItem.messageText;
 
                 if (itemString) {
-                    let queueMessage: IQueueMessage<T> = <IQueueMessage<T>>JSON.parse(itemString);
+                    const queueMessage: IQueueMessage<T> = <IQueueMessage<T>>JSON.parse(itemString);
                     if (queueMessage) {
-                        let messageConverter: QueueMessageConverter = new QueueMessageConverter();
-                        let messageConverted: T = await messageConverter.convertFromMessage<T>(queueMessage);
+                        const messageConverter: QueueMessageConverter = new QueueMessageConverter();
+                        const messageConverted: T = await messageConverter.convertFromMessage<T>(queueMessage);
                         result.data = messageConverted;
                         result.messageId = firstItem.messageId + "|" + firstItem.popReceipt;
                     }
@@ -88,18 +88,18 @@ export class AzureQueueStorageManager implements IQueueStorageManager {
         result.data = null;
 
         try {
-            let queueClient: QueueClient = await this.queueServiceClient.getQueueClient(queueName);
+            const queueClient: QueueClient = await this.queueServiceClient.getQueueClient(queueName);
 
-            let response: QueuePeekMessagesResponse = await queueClient.peekMessages();
+            const response: QueuePeekMessagesResponse = await queueClient.peekMessages();
             if (response && response.peekedMessageItems && response.peekedMessageItems.length > 0) {
-                let firstItem: PeekedMessageItem = response.peekedMessageItems[0];
-                let itemString: string = firstItem.messageText;
+                const firstItem: PeekedMessageItem = response.peekedMessageItems[0];
+                const itemString: string = firstItem.messageText;
 
                 if (itemString) {
-                    let queueMessage: IQueueMessage<T> = <IQueueMessage<T>>JSON.parse(itemString);
+                    const queueMessage: IQueueMessage<T> = <IQueueMessage<T>>JSON.parse(itemString);
                     if (queueMessage) {
-                        let messageConverter: QueueMessageConverter = new QueueMessageConverter();
-                        let messageConverted: T = await messageConverter.convertFromMessage<T>(queueMessage);
+                        const messageConverter: QueueMessageConverter = new QueueMessageConverter();
+                        const messageConverted: T = await messageConverter.convertFromMessage<T>(queueMessage);
                         result.data = messageConverted;
                         result.messageId = firstItem.messageId + "|";
                     }
@@ -116,14 +116,14 @@ export class AzureQueueStorageManager implements IQueueStorageManager {
         let result: IOperationResult = AzureQueueDocumentResult.buildSuccess();
 
         try {
-            let queueClient: QueueClient = await this.queueServiceClient.getQueueClient(queueName);
+            const queueClient: QueueClient = await this.queueServiceClient.getQueueClient(queueName);
             
-            let messageSplit: string[] = messageId.split('|');
+            const messageSplit: string[] = messageId.split('|');
             if (messageSplit.length !== 2) {
                 throw new Error('Message id not in the right format. Requires format: messageId|popReceipt');
             }
 
-            let messageIdDeleteResponse: MessageIdDeleteResponse = await queueClient.deleteMessage(messageSplit[0], messageSplit[1]);
+            const messageIdDeleteResponse: MessageIdDeleteResponse = await queueClient.deleteMessage(messageSplit[0], messageSplit[1]);
         } catch (err) {
             result = AzureQueueDocumentResult.buildSimpleError('Error deleting message: ' + err, ErrorHelper.isError(err) ? err : new Error(err));
         }

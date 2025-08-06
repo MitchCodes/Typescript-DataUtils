@@ -5,7 +5,7 @@ import { Base64 } from 'js-base64';
 
 export class QueueMessageConverter {
     public async convertToMessage<T>(input: T, options: QueueMessageOptions = null): Promise<IQueueMessage<T>> {
-        let queueMessage: QueueMessage<T> = new QueueMessage<T>();
+        const queueMessage: QueueMessage<T> = new QueueMessage<T>();
 
         if (!options) {
             options = new QueueMessageOptions();
@@ -20,7 +20,7 @@ export class QueueMessageConverter {
         
 
 
-        let inputAsString: string = JSON.stringify(input);
+        const inputAsString: string = JSON.stringify(input);
 
         let inputCompressed: string | Buffer = inputAsString;
         if (options.gzipCompress) {
@@ -36,10 +36,11 @@ export class QueueMessageConverter {
                 finalMsg = inputCompressed.toString();
             }
         } else {
+            const inputString = inputCompressed as string;
             if (options.convertToBase64) {
-                finalMsg = Base64.encode(inputCompressed);
+                finalMsg = Base64.encode(inputString);
             } else {
-                finalMsg = inputCompressed;
+                finalMsg = inputString;
             }
         }
 
@@ -64,13 +65,13 @@ export class QueueMessageConverter {
 
             let inputUngzip: string = null;
             if (input.gzip) {
-                let unGzippedBuffer: any = await ungzip(inputUnbase64);
+                const unGzippedBuffer: any = await ungzip(inputUnbase64);
                 inputUngzip = Buffer.from(unGzippedBuffer).toString();
             } else {
                 inputUngzip = <string>inputUnbase64;
             }
 
-            let inputAsT: T = <T>JSON.parse(inputUngzip);
+            const inputAsT: T = <T>JSON.parse(inputUngzip);
             
             if (inputAsT) {
                 return inputAsT;
