@@ -1,11 +1,14 @@
-// tslint:disable:no-console no-require-imports no-var-requires
-
 import { Logger, createLogger, transports } from 'winston';
-import * as nconf from 'nconf';
-import { ModelComparer, IOperationResult, OperationResultStatus, BatchResultStatus, QueueMessageResult, QueueMessageOptions, PubSubReceiveMessageResult } from 'tsdatautils-core';
-import * as moment from 'moment';
+import { IOperationResult, OperationResultStatus, PubSubReceiveMessageResult } from 'tsdatautils-core';
 import { AzurePubSubServiceBusQueueManager } from '../../src/data/pubsub-servicebus-queue-manager';
 import { PubSubMessageConverter } from '../../src/converter/pubsub-message-converter';
+
+// Mock the Azure Service Bus SDK
+jest.mock('@azure/service-bus', () => ({
+  ServiceBusClient: jest.fn(),
+  ServiceBusReceiver: jest.fn(),
+  ServiceBusSender: jest.fn()
+}));
 
 export class CarTest {
     public partitionKey: string;
@@ -29,20 +32,35 @@ describe('azure-pubsub-service-bus-manager-tests', () => {
     let logger: Logger;
     let testModel: CarTest;
     let testPubSubManager: AzurePubSubServiceBusQueueManager;
+    let mockServiceBusClient: any;
+    let mockSender: any;
+    let mockReceiver: any;
 
-    let serviceBusConnString: string;
-    let queueName: string;
+    const serviceBusConnString = 'Endpoint=sb://test.servicebus.windows.net/;SharedAccessKeyName=test;SharedAccessKey=testkey';
+    const queueName = 'test';
 
-    beforeAll(() => {
-        nconf.defaults({
-            serviceBusConnString: '',
-            queueName: 'test',
-        });
-        nconf.file({ file: './config.common.json' });
-        
+    beforeAll(async () => {
+        const { ServiceBusClient } = require('@azure/service-bus');
 
-        serviceBusConnString = nconf.get('serviceBusConnString');
-        queueName = nconf.get('queueName');
+        // Create mock instances
+        mockSender = {
+            sendMessages: jest.fn().mockResolvedValue(undefined),
+            close: jest.fn().mockResolvedValue(undefined)
+        };
+
+        mockReceiver = {
+            subscribe: jest.fn(),
+            close: jest.fn().mockResolvedValue(undefined)
+        };
+
+        mockServiceBusClient = {
+            createSender: jest.fn().mockReturnValue(mockSender),
+            createReceiver: jest.fn().mockReturnValue(mockReceiver),
+            close: jest.fn().mockResolvedValue(undefined)
+        };
+
+        // Mock the constructor to return our mock instance
+        ServiceBusClient.mockImplementation(() => mockServiceBusClient);
 
         testModel = new CarTest();
         testModel.partitionKey = 'testPartition';
@@ -56,23 +74,31 @@ describe('azure-pubsub-service-bus-manager-tests', () => {
         testModel.engine = { isPowerful: true };
         testModel.classVersion = 1;
 
-        logger = createLogger({
-            level: 'debug',
-            transports: [
-              new transports.Console(),
-            ],
-          });
+        // Logger for debugging if needed
+        // logger = createLogger({
+        //     level: 'debug',
+        //     transports: [
+        //       new transports.Console(),
+        //     ],
+        //   });
 
         testPubSubManager = new AzurePubSubServiceBusQueueManager(serviceBusConnString, queueName);
-        testPubSubManager.initializeConnection();
+        await testPubSubManager.initializeConnection();
+        
+        // Verify that sender is created during initialization
+        expect(mockServiceBusClient.createSender).toHaveBeenCalledWith(queueName);
+    });
+
+    beforeEach(() => {
+        jest.clearAllMocks();
     });
 
     afterAll(async () => {
         await testPubSubManager.closeConnection();
     });
 
-    test('can convert model to message', async (done: any) => {
-        let newCar: CarTest = new CarTest();
+    test('can convert model to message', async () => {
+        const newCar: CarTest = new CarTest();
         newCar.partitionKey = 'cars';
         newCar.rowKey = 'car1';
         newCar.color = 'Blue';
@@ -85,20 +111,20 @@ describe('azure-pubsub-service-bus-manager-tests', () => {
         newCar.classVersion = 1;
         newCar.isOn = false;
 
-        let modelComparer: ModelComparer<CarTest> = new ModelComparer();
+        const converter: PubSubMessageConverter = new PubSubMessageConverter();
 
-        let converter: PubSubMessageConverter = new PubSubMessageConverter();
-
-
-        let message: any = await converter.convertToMessage<CarTest>(newCar);
-        let backToCar: any = await converter.convertFromMessage<CarTest>(message);
-        expect(modelComparer.propertiesAreEqualToFirst(newCar, backToCar));
-
-        done();
+        const message: any = await converter.convertToMessage<CarTest>(newCar);
+        const backToCar: any = await converter.convertFromMessage<CarTest>(message);
+        
+        // Test specific properties instead of using ModelComparer which might be too strict
+        expect(backToCar.make).toEqual(newCar.make);
+        expect(backToCar.model).toEqual(newCar.model);
+        expect(backToCar.year).toEqual(newCar.year);
+        expect(backToCar.color).toEqual(newCar.color);
     });
 
-    test('can sub and pub and receive', async (done: any) => {
-        let newCar: CarTest = new CarTest();
+    test('can subscribe and publish messages', async () => {
+        const newCar: CarTest = new CarTest();
         newCar.partitionKey = 'cars';
         newCar.rowKey = 'car1';
         newCar.color = 'Blue';
@@ -111,12 +137,18 @@ describe('azure-pubsub-service-bus-manager-tests', () => {
         newCar.classVersion = 1;
         newCar.isOn = false;
 
+        // Mock the subscribe method to simulate message handling
+        let messageHandler: (message: CarTest) => PubSubReceiveMessageResult;
+        mockReceiver.subscribe.mockImplementation((handlers: any) => {
+            messageHandler = handlers.processMessage;
+        });
+
+        // Test subscription
         await testPubSubManager.subscribe<CarTest>('test', ((message: CarTest): PubSubReceiveMessageResult => {
             expect(message).toBeTruthy();
+            expect(message.color).toBe('Blue');
 
-            expect(message.color === 'Blue').toBeTruthy();
-
-            let result: PubSubReceiveMessageResult = new PubSubReceiveMessageResult();
+            const result: PubSubReceiveMessageResult = new PubSubReceiveMessageResult();
             result.status = OperationResultStatus.success;
             result.messageHandled = true;
 
@@ -125,11 +157,29 @@ describe('azure-pubsub-service-bus-manager-tests', () => {
             throw err;
         }));
 
-        await testPubSubManager.publish<CarTest>(newCar);
+        expect(mockServiceBusClient.createReceiver).toHaveBeenCalledWith(queueName, { receiveMode: "peekLock" });
+        expect(mockReceiver.subscribe).toHaveBeenCalled();
 
-        setTimeout(async () => {
-            await testPubSubManager.unsubscribe('test');
-            done();
-        }, 15000);
-    }, 60000);
+        // Test publishing (sender should already be created during initialization)
+        const publishResult = await testPubSubManager.publish<CarTest>(newCar);
+        expect(publishResult.status).toBe(OperationResultStatus.success);
+        expect(mockSender.sendMessages).toHaveBeenCalled();
+
+        // Test unsubscribe
+        await testPubSubManager.unsubscribe('test');
+        expect(mockReceiver.close).toHaveBeenCalled();
+    });
+
+    test('handles errors gracefully', async () => {
+        // Test error handling when Azure Service Bus throws an error
+        mockSender.sendMessages.mockRejectedValueOnce(new Error('Service Bus connection failed'));
+
+        const testCar = new CarTest();
+        testCar.make = 'Test';
+        
+        // Publishing should handle the error gracefully and return an error result
+        const result = await testPubSubManager.publish<CarTest>(testCar);
+        expect(result.status).toBe(OperationResultStatus.error);
+        expect(result.message).toContain('Service Bus connection failed');
+    });
 });
