@@ -3,22 +3,22 @@ import { FunctionHelper } from './helpers/function.helper';
 
 export class ClassFunctionThrottler {
     public getThrottledClass<T>(obj: T, limit: number, intervalMs: number, strictThrottleAlgorithm: boolean = false): T {
-        let newObj = {};
+        const newObj = {};
         newObj['$obj'] = obj;
 
-        let throttle = pThrottle({
+        const throttle = pThrottle({
             limit: limit,
             interval: intervalMs,
             strict: strictThrottleAlgorithm
         });
 
-        let throttleFn = throttle((args: any[], obj: Object, funcName: string, thisArg: any) => {
+        const throttleFn = throttle((args: any[], obj: Object, funcName: string, thisArg: any) => {
             return obj[funcName].apply(thisArg, args);
         })
 
-        let functionHelper: FunctionHelper = new FunctionHelper();
-        let functions: string[] = functionHelper.getAllFunctions(obj, true);
-        for (let key of functions) {
+        const functionHelper: FunctionHelper = new FunctionHelper();
+        const functions: string[] = functionHelper.getAllFunctions(obj, true);
+        for (const key of functions) {
             if (obj[key] && typeof obj[key] === 'function') {
                 newObj[key] = (...args) => {
                     return throttleFn(args, obj, key, newObj['$obj']);

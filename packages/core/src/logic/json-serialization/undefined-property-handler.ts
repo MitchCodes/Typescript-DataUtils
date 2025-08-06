@@ -11,8 +11,8 @@ export class UndefinedJsonPropertyHandler implements IJsonPropertyHandler {
     }
     
     public handlePropertyPreStringify(obj: any, propertyKey: string, propertyValue: any): void {
-        let metadataPropKey: string = '$serialize_' + propertyKey;
-        let metadataPropVal: any = {
+        const metadataPropKey: string = '$serialize_' + propertyKey;
+        const metadataPropVal: any = {
             $serialize_key: propertyKey,
             type: 'undefined',
         };
@@ -21,7 +21,7 @@ export class UndefinedJsonPropertyHandler implements IJsonPropertyHandler {
     }
 
     public handlePropertyPostStringify(obj: any, propertyKey: string, propertyValue: any): void {
-        let metadataPropKey: string = '$serialize_' + propertyKey;
+        const metadataPropKey: string = '$serialize_' + propertyKey;
 
         delete obj[metadataPropKey];
     }
@@ -37,7 +37,7 @@ export class UndefinedJsonPropertyHandler implements IJsonPropertyHandler {
     }
 
     public handlePropertyPostParse(obj: any, propertyKey: string, propertyValue: any): void {
-        let undefinedProp: string = propertyValue.$serialize_key;
+        const undefinedProp: string = propertyValue.$serialize_key;
         
         obj[undefinedProp] = undefined;
 

@@ -24,7 +24,7 @@ export class WinstonDateStampModifier extends WinstonLogMessageModifier {
         super();
 
         this.modifier = (msg: string): string => {
-            let time: moment.Moment = moment();
+            const time: moment.Moment = moment();
             let timeFormatted: string = time.toDate().getTime().toString();
 
             switch (type) {
@@ -58,8 +58,8 @@ export class WinstonDateStampFormatModifier extends WinstonLogMessageModifier {
         super();
 
         this.modifier = (msg: string): string => {
-            let time: moment.Moment = moment();
-            let timeFormatted: string = time.format(format);            
+            const time: moment.Moment = moment();
+            const timeFormatted: string = time.format(format);            
 
             return timeFormatted + delimiter + msg;
         };
@@ -99,7 +99,7 @@ export class WinstonLogger implements ILogger {
     private modifyMessage(msg: string): string {
         let finalMessage: string = msg;
 
-        for (let messageModifier of this.messageModifiers) {
+        for (const messageModifier of this.messageModifiers) {
             if (messageModifier) {
                 finalMessage = messageModifier.modifier(finalMessage);
             }

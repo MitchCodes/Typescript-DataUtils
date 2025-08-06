@@ -1,7 +1,8 @@
 module.exports = {
+  preset: 'ts-jest',
   testEnvironment: 'node',
   transform: {
-    '.(ts|tsx)': 'ts-jest'
+    '^.+\\.(ts|tsx)$': 'ts-jest'
   },
   moduleFileExtensions: [
     'ts',
@@ -10,14 +11,14 @@ module.exports = {
     'jsx',
     'json'
   ],
-  testRegex: '(/__tests__/)(?!(main)/).*(spec|test)\.(ts|js)x?$',
+  testRegex: '(/__tests__/)(?!(main)/).*(spec|test)\\.(ts|js)x?$',
   coverageDirectory: 'coverage',
   collectCoverageFrom: [
     'src/**/*.{ts,tsx,js,jsx}',
     '!src/**/*.d.ts',
   ],
-  globals: {
-    "ts-jest": {
-    }
-  }
+  extensionsToTreatAsEsm: ['.ts'],
+  transformIgnorePatterns: [
+    'node_modules/(?!(p-throttle|concurrent-queue)/)'  
+  ]
 };

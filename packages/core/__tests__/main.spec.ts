@@ -39,7 +39,7 @@ export class CarService {
   public timesFailedAsync: number = 0;
   
   public async getCar(tireName: string, model: string, uselessInput: number): Promise<CarTest> {
-    let carTest: CarTest = new CarTest();
+    const carTest: CarTest = new CarTest();
     carTest.tireName = tireName;
     carTest.model = model;
     return carTest;
@@ -122,38 +122,38 @@ describe('json serializer tests', () => {
   });
 
   test('expect json serializer to work', () => {
-    let serialized: string = JSON.stringify(testModel);
+    const serialized: string = JSON.stringify(testModel);
     console.debug('Serialized car using json stringify: ' + serialized);
 
-    let parsed: CarTest = JSON.parse(serialized);
+    const parsed: CarTest = JSON.parse(serialized);
 
     expect(carCompareHelper.propertiesAreEqualToFirst(testModel, parsed)).not.toBeTruthy();
 
     let jsonSerializer: JsonSerializer = new JsonSerializer([new DateJsonPropertyHandler()]);
-    let serializedTwo: string = jsonSerializer.stringify(testModel);
+    const serializedTwo: string = jsonSerializer.stringify(testModel);
     console.debug('Serialized car using json serializer w/ just date helper: ' + serializedTwo);
-    let parsedTwo: CarTest = jsonSerializer.parse(serializedTwo);
+    const parsedTwo: CarTest = jsonSerializer.parse(serializedTwo);
 
     expect(carCompareHelper.propertiesAreEqualToFirst(testModel, parsedTwo)).toBeTruthy();
 
     jsonSerializer = new JsonSerializer([new DateJsonPropertyHandler(), new UndefinedJsonPropertyHandler()]);
-    let serializedThree: string = jsonSerializer.stringify(testModel);
+    const serializedThree: string = jsonSerializer.stringify(testModel);
     console.debug('Serialized car using json serializer: ' + serializedThree);
-    let parsedThree: CarTest = jsonSerializer.parse(serializedThree);
+    const parsedThree: CarTest = jsonSerializer.parse(serializedThree);
 
     expect(carCompareHelper.propertiesAreEqualToFirst(testModel, parsedThree)).toBeTruthy();
   });
 
-  test('expect retry logic to work', async (done) => {
-    let carServiceOne: CarService = new CarService();
+  test('expect retry logic to work', async () => {
+    const carServiceOne: CarService = new CarService();
     carServiceOne.someField = 'one';
 
-    let classFunctionRetrier: ClassFunctionRetrier = new ClassFunctionRetrier();
-    let retriedCarService: CarService = classFunctionRetrier.getRetryableClass<CarService>(carServiceOne, 3);
-    let retriedCarServiceAsync: CarService = classFunctionRetrier.getRetryableClassAsync<CarService>(carServiceOne, 3);
+    const classFunctionRetrier: ClassFunctionRetrier = new ClassFunctionRetrier();
+    const retriedCarService: CarService = classFunctionRetrier.getRetryableClass<CarService>(carServiceOne, 3);
+    const retriedCarServiceAsync: CarService = classFunctionRetrier.getRetryableClassAsync<CarService>(carServiceOne, 3);
 
-    let someFieldOne: string = retriedCarService.getSomeFieldWithFailNumber();
-    let someFieldTwo: string = await retriedCarServiceAsync.getSomeFieldWithFailNumberAsync();
+    const someFieldOne: string = retriedCarService.getSomeFieldWithFailNumber();
+    const someFieldTwo: string = await retriedCarServiceAsync.getSomeFieldWithFailNumberAsync();
 
     expect(someFieldOne === 'one').toBeTruthy();
     expect(someFieldTwo === 'one').toBeTruthy();
@@ -178,58 +178,54 @@ describe('json serializer tests', () => {
     expect(errorHappened).toBeTruthy();
     expect(errorHappenedAsync).toBeTruthy();
 
-    let retriedCarServiceWithBlahReturn: CarService = classFunctionRetrier.getRetryableClass<CarService>(carServiceOne, 3, (error: any, functionName: string): any => {
+    const retriedCarServiceWithBlahReturn: CarService = classFunctionRetrier.getRetryableClass<CarService>(carServiceOne, 3, (error: any, functionName: string): any => {
       return 'blah';
     });
 
-    let retriedCarServiceWithBlahReturnAsync: CarService = classFunctionRetrier.getRetryableClassAsync<CarService>(carServiceOne, 3, (error: any, functionName: string): any => {
+    const retriedCarServiceWithBlahReturnAsync: CarService = classFunctionRetrier.getRetryableClassAsync<CarService>(carServiceOne, 3, (error: any, functionName: string): any => {
       return 'blah';
     });
 
-    let someFieldOneBlah: string = retriedCarServiceWithBlahReturn.getSomeFieldAlwaysFails();
-    let someFieldTwoBlah: string = await retriedCarServiceWithBlahReturnAsync.getSomeFieldAlwaysFailsAsync();
+    const someFieldOneBlah: string = retriedCarServiceWithBlahReturn.getSomeFieldAlwaysFails();
+    const someFieldTwoBlah: string = await retriedCarServiceWithBlahReturnAsync.getSomeFieldAlwaysFailsAsync();
 
     expect(someFieldOneBlah === 'blah').toBeTruthy();
     expect(someFieldTwoBlah === 'blah').toBeTruthy();
-
-    done();
   });
 
-  test('expect round robin to work', async (done) => {
-    let carServiceOne: CarService = new CarService();
+  test('expect round robin to work', async () => {
+    const carServiceOne: CarService = new CarService();
     carServiceOne.someField = 'one';
 
-    let carServiceTwo: CarService = new CarService();
+    const carServiceTwo: CarService = new CarService();
     carServiceTwo.someField = 'two';
 
-    let carServiceThree: CarService = new CarService();
+    const carServiceThree: CarService = new CarService();
     carServiceThree.someField = 'three';
 
-    let roundRobinDistributor: ClassFunctionDistributorCreator = new ClassFunctionDistributorCreator();
-    let distributedCarService: CarService & IClassFunctionDistributor<CarService> = roundRobinDistributor.getDistributedObject<CarService>([carServiceOne, carServiceTwo, carServiceThree], new RoundRobinClassFunctionDistributorAlgorithm());
+    const roundRobinDistributor: ClassFunctionDistributorCreator = new ClassFunctionDistributorCreator();
+    const distributedCarService: CarService & IClassFunctionDistributor<CarService> = roundRobinDistributor.getDistributedObject<CarService>([carServiceOne, carServiceTwo, carServiceThree], new RoundRobinClassFunctionDistributorAlgorithm());
     
-    let someFieldOne: string = distributedCarService.getSomeField();
-    let someFieldTwo: string = distributedCarService.getSomeField();
-    let someFieldThree: string = distributedCarService.getSomeField();
-    let someFieldFour: string = distributedCarService.getSomeField();
+    const someFieldOne: string = distributedCarService.getSomeField();
+    const someFieldTwo: string = distributedCarService.getSomeField();
+    const someFieldThree: string = distributedCarService.getSomeField();
+    const someFieldFour: string = distributedCarService.getSomeField();
 
     expect(someFieldOne === 'one').toBeTruthy();
     expect(someFieldTwo === 'two').toBeTruthy();
     expect(someFieldThree === 'three').toBeTruthy();
     expect(someFieldFour === 'one').toBeTruthy();
-
-    done();
   });
   
-  test('expect queued command runner to work', async (done) => {
-    let queuedCommandRunner: QueuedCommandRunner = new QueuedCommandRunner();
+  test('expect queued command runner to work', async () => {
+    const queuedCommandRunner: QueuedCommandRunner = new QueuedCommandRunner();
 
     let jobStarted: boolean = false;
     let jobFinished: boolean = false;
     let errorHappened: boolean = false;
 
-    let beginning: number = Date.now();
-    let lastExecuted: number = Date.now();
+    const beginning: number = Date.now();
+    const lastExecuted: number = Date.now();
 
     let jobsFinished: number = 0;
 
@@ -292,25 +288,26 @@ describe('json serializer tests', () => {
       }, 'test2', 4));
     }
 
-    setTimeout(() => {
-      expect(jobStarted).toBeTruthy();
-      expect(jobFinished).toBeTruthy();
-      expect(errorHappened).toBeTruthy();
-      expect(jobsFinished === 20).toBeTruthy();
-
-      done();
-    },25000);
+    await new Promise<void>((resolve) => {
+      setTimeout(() => {
+        expect(jobStarted).toBeTruthy();
+        expect(jobFinished).toBeTruthy();
+        expect(errorHappened).toBeTruthy();
+        expect(jobsFinished === 20).toBeTruthy();
+        resolve();
+      }, 25000);
+    });
   }, 45000);
 
-  test('test class throttler', async (done) => {
-    let classFunctionThrottler: ClassFunctionThrottler = new ClassFunctionThrottler();
+  test('test class throttler', async () => {
+    const classFunctionThrottler: ClassFunctionThrottler = new ClassFunctionThrottler();
 
-    let carService: CarService = new CarService();
-    let carServiceThrottled: CarService = classFunctionThrottler.getThrottledClass<CarService>(carService, 2, 1000);
+    const carService: CarService = new CarService();
+    const carServiceThrottled: CarService = classFunctionThrottler.getThrottledClass<CarService>(carService, 2, 1000);
 
     expect(carServiceThrottled).not.toBeNull();
 
-    let beginning: number = Date.now();
+    const beginning: number = Date.now();
     let lastExecuted: number = Date.now();
 
     let timesExecuted: number = 0;
@@ -323,27 +320,28 @@ describe('json serializer tests', () => {
       });
     }
 
-    setTimeout(() => {
-      expect(timesExecuted === 15).toBeTruthy();
+    await new Promise<void>((resolve) => {
+      setTimeout(() => {
+        expect(timesExecuted === 15).toBeTruthy();
 
-      let timeElapsed: number = lastExecuted - beginning;
-      expect(timeElapsed > 5000).toBeTruthy();
-
-      done();
-    },15000);
+        const timeElapsed: number = lastExecuted - beginning;
+        expect(timeElapsed > 5000).toBeTruthy();
+        resolve();
+      }, 15000);
+    });
   }, 30000);
 
-  test('expect throttled pubsub to work', async (done) => {
-    let throttledQueue: ThrottledMemoryQueuePubSubManager = new ThrottledMemoryQueuePubSubManager(2, 1000);
+  test('expect throttled pubsub to work', async () => {
+    const throttledQueue: ThrottledMemoryQueuePubSubManager = new ThrottledMemoryQueuePubSubManager(2, 1000);
     await throttledQueue.initializeConnection();
 
-    let beginning: number = Date.now();
+    const beginning: number = Date.now();
     let lastExecuted: number = Date.now();
 
     let timesExecuted: number = 0;
 
     throttledQueue.subscribe<string>('test', ((message: string): PubSubReceiveMessageResult => {
-      let result: PubSubReceiveMessageResult = new PubSubReceiveMessageResult();
+      const result: PubSubReceiveMessageResult = new PubSubReceiveMessageResult();
       result.messageHandled = true;
 
       timesExecuted++;
@@ -359,14 +357,15 @@ describe('json serializer tests', () => {
       await throttledQueue.publish<string>((++index).toString());
     }
 
-    setTimeout(() => {
-      expect(timesExecuted === 15).toBeTruthy();
+    await new Promise<void>((resolve) => {
+      setTimeout(() => {
+        expect(timesExecuted === 15).toBeTruthy();
 
-      let timeElapsed: number = lastExecuted - beginning;
-      expect(timeElapsed > 5000).toBeTruthy();
-
-      done();
-    },15000);
+        const timeElapsed: number = lastExecuted - beginning;
+        expect(timeElapsed > 5000).toBeTruthy();
+        resolve();
+      }, 15000);
+    });
   }, 30000);
 
 });

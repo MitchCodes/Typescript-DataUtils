@@ -17,27 +17,27 @@ export class JsonSerializer implements IJsonStringifier, IJsonParser {
 
     public stringify(value: any, replacer?: (key: string, value: any) => any, space?: string | number): string {
         this.preStringifyForObjHandlers(value);
-        let stringifiedObj: string = JSON.stringify(value, replacer, space);
+        const stringifiedObj: string = JSON.stringify(value, replacer, space);
         this.postStringifyForObjHandlers(value);
 
         return stringifiedObj;
     }
 
     public parse(text: string, reviver?: (key: any, value: any) => any) {
-        let parsedObj: any = JSON.parse(text, reviver);
+        const parsedObj: any = JSON.parse(text, reviver);
         this.postParseForObjHandlers(parsedObj);
 
         return parsedObj;
     }
 
     private preStringifyForObjHandlers(obj: any): void {
-        let objPropKeys: string[] = Object.keys(obj);
+        const objPropKeys: string[] = Object.keys(obj);
 
-        for (let objKey of objPropKeys) {
-            let prop = obj[objKey];
-            let propType = typeof prop;
+        for (const objKey of objPropKeys) {
+            const prop = obj[objKey];
+            const propType = typeof prop;
 
-            for (let propertyHandler of this.propertyHandlers) {
+            for (const propertyHandler of this.propertyHandlers) {
                 let propHandled: boolean = false;
                 if (propertyHandler.canHandleStringify(obj, objKey, prop)) {
                     propertyHandler.handlePropertyPreStringify(obj, objKey, prop);
@@ -55,13 +55,13 @@ export class JsonSerializer implements IJsonStringifier, IJsonParser {
     }
 
     private postStringifyForObjHandlers(obj: any): void {
-        let objPropKeys: string[] = Object.keys(obj);
+        const objPropKeys: string[] = Object.keys(obj);
 
-        for (let objKey of objPropKeys) {
-            let prop = obj[objKey];
-            let propType = typeof prop;
+        for (const objKey of objPropKeys) {
+            const prop = obj[objKey];
+            const propType = typeof prop;
 
-            for (let propertyHandler of this.propertyHandlers) {
+            for (const propertyHandler of this.propertyHandlers) {
                 let propHandled: boolean = false;
                 if (propertyHandler.canHandleStringify(obj, objKey, prop)) {
                     propertyHandler.handlePropertyPostStringify(obj, objKey, prop);
@@ -79,13 +79,13 @@ export class JsonSerializer implements IJsonStringifier, IJsonParser {
     }
 
     private postParseForObjHandlers(obj: any): void {
-        let objPropKeys: string[] = Object.keys(obj);
+        const objPropKeys: string[] = Object.keys(obj);
 
-        for (let objKey of objPropKeys) {
-            let prop = obj[objKey];
-            let propType = typeof prop;
+        for (const objKey of objPropKeys) {
+            const prop = obj[objKey];
+            const propType = typeof prop;
 
-            for (let propertyHandler of this.propertyHandlers) {
+            for (const propertyHandler of this.propertyHandlers) {
                 let propHandled: boolean = false;
                 if (propertyHandler.canHandleParse(obj, objKey, prop)) {
                     propertyHandler.handlePropertyPostParse(obj, objKey, prop);

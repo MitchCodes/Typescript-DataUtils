@@ -3,7 +3,7 @@ import { ErrorHelper } from "./helpers/error.helper";
 
 export class ClassFunctionRetrier {
     public getRetryableClass<T>(obj: T, maxRetryAmount: number, maxRetryReturn: (error: any, functionName: string) => any = null, errorCallback: (error: any) => void = null): T {
-        let newObj = {};
+        const newObj = {};
         newObj['$obj'] = obj;
 
         if (maxRetryReturn === null) {
@@ -12,9 +12,9 @@ export class ClassFunctionRetrier {
             };
         }
 
-        let functionHelper: FunctionHelper = new FunctionHelper();
-        let functions: string[] = functionHelper.getAllFunctions(obj, true);
-        for (let key of functions) {
+        const functionHelper: FunctionHelper = new FunctionHelper();
+        const functions: string[] = functionHelper.getAllFunctions(obj, true);
+        for (const key of functions) {
             if (obj[key] && typeof obj[key] === 'function') {
                 newObj[key] = (...args) => {
                     if (obj[key]) {
@@ -63,7 +63,7 @@ export class ClassFunctionRetrier {
     }
 
     public getRetryableClassAsync<T>(obj: T, maxRetryAmount: number, maxRetryReturn: (error: any, functionName: string) => any = null, errorCallback: (error: any) => void = null): T {
-        let newObj = {};
+        const newObj = {};
         newObj['$obj'] = obj;
 
         if (maxRetryReturn === null) {
@@ -72,9 +72,9 @@ export class ClassFunctionRetrier {
             };
         }
 
-        let functionHelper: FunctionHelper = new FunctionHelper();
-        let functions: string[] = functionHelper.getAllFunctions(obj, true);
-        for (let key of functions) {
+        const functionHelper: FunctionHelper = new FunctionHelper();
+        const functions: string[] = functionHelper.getAllFunctions(obj, true);
+        for (const key of functions) {
             if (obj[key] && typeof obj[key] === 'function') {
                 newObj[key] = async (...args) => {
                     if (obj[key]) {

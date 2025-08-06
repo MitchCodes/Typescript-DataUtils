@@ -1,12 +1,12 @@
 export class FunctionHelper {
     public getAllFunctions(mainObj: any, excludeCommonFunctions: boolean = true): string[] {
-        var props = [];
-        var obj = mainObj;
+        let props = [];
+        let obj = mainObj;
         do {
             props = props.concat(Object.getOwnPropertyNames(obj));
         } while (obj = Object.getPrototypeOf(obj));
     
-        let allFunctions: string[] = props.sort().filter(function(e, i, arr) { 
+        const allFunctions: string[] = props.sort().filter(function(e, i, arr) { 
             if (e!=arr[i+1] && typeof mainObj[e] == 'function') {
                 return true;
             } else {
@@ -18,9 +18,9 @@ export class FunctionHelper {
     }
 
     private excludeCommonFuncs(allFuncs: string[]): string[] {
-        let returnFunctions: string[] = [];
+        const returnFunctions: string[] = [];
 
-        let commonFunctions: string[] = [
+        const commonFunctions: string[] = [
             '__defineGetter__',
             '__defineSetter__',
             '__lookupGetter__',
@@ -34,7 +34,7 @@ export class FunctionHelper {
             'valueOf'
         ];
         
-        for(let func of allFuncs) {
+        for(const func of allFuncs) {
             if (commonFunctions.indexOf(func) === -1) {
                 returnFunctions.push(func);
             }

@@ -67,7 +67,7 @@ export class ThrottledMemoryQueuePubSubManager implements IPubSubManager {
 
         let subscriberIndex: number = -1;
         for (let i = 0; i < this.subscribers.length; i++) {
-            let subscriber: ThrottlePubSubSubscriber = this.subscribers[i];
+            const subscriber: ThrottlePubSubSubscriber = this.subscribers[i];
             if (subscriber && subscriber.subscriptionId) {
                 if (subscriber.subscriptionId === subscriberId) {
                     subscriberIndex = i;
@@ -81,7 +81,7 @@ export class ThrottledMemoryQueuePubSubManager implements IPubSubManager {
             return result;
         }
 
-        let newSubscriber: ThrottlePubSubSubscriber = new ThrottlePubSubSubscriber();
+        const newSubscriber: ThrottlePubSubSubscriber = new ThrottlePubSubSubscriber();
         newSubscriber.subscriptionId = subscriberId;
         newSubscriber.messageCallback = messageCallback;
         newSubscriber.errorCallback = errorCallback;
@@ -100,7 +100,7 @@ export class ThrottledMemoryQueuePubSubManager implements IPubSubManager {
 
         let subscriberIndex: number = -1;
         for (let i = 0; i < this.subscribers.length; i++) {
-            let subscriber: ThrottlePubSubSubscriber = this.subscribers[i];
+            const subscriber: ThrottlePubSubSubscriber = this.subscribers[i];
             if (subscriber && subscriber.subscriptionId) {
                 if (subscriber.subscriptionId === subscriberId) {
                     subscriberIndex = i;
@@ -120,7 +120,7 @@ export class ThrottledMemoryQueuePubSubManager implements IPubSubManager {
     }
 
     public async getSubscriptionStatus(subscriberId: string): Promise<PubSubSubscriptionStatus> {
-        let subscriptionStatus: PubSubSubscriptionStatus = new PubSubSubscriptionStatus();
+        const subscriptionStatus: PubSubSubscriptionStatus = new PubSubSubscriptionStatus();
         subscriptionStatus.state = PubSubSubscriptionState.Unknown;
 
         if (!this.subscribers) {
@@ -130,7 +130,7 @@ export class ThrottledMemoryQueuePubSubManager implements IPubSubManager {
         let subscriberIndex: number = -1;
         let foundSubscriber: ThrottlePubSubSubscriber = null;
         for (let i = 0; i < this.subscribers.length; i++) {
-            let subscriber: ThrottlePubSubSubscriber = this.subscribers[i];
+            const subscriber: ThrottlePubSubSubscriber = this.subscribers[i];
             if (subscriber && subscriber.subscriptionId) {
                 if (subscriber.subscriptionId === subscriberId) {
                     subscriberIndex = i;
@@ -155,12 +155,12 @@ export class ThrottledMemoryQueuePubSubManager implements IPubSubManager {
 
     private async handleDequeue(message: any): Promise<void> {
         try {
-            let isHandled: boolean = this.sendSubscribersMessage(message);
+            const isHandled: boolean = this.sendSubscribersMessage(message);
             if (!isHandled) {
                 this.sendSubscribersError(new Error("Not all subscribers handled throttled queue message"));
             }
         } catch (err) {
-            let messageErr: Error = ErrorHelper.isError(err) ? err : new Error("Error handling and completing service bus message for throttled queue: " + err);
+            const messageErr: Error = ErrorHelper.isError(err) ? err : new Error("Error handling and completing service bus message for throttled queue: " + err);
             this.sendSubscribersError(messageErr);
         }
         
@@ -169,8 +169,8 @@ export class ThrottledMemoryQueuePubSubManager implements IPubSubManager {
 
     private sendSubscribersMessage(message: any): boolean {
         let allHandled: boolean = true;
-        for (let subscriber of this.subscribers) {
-            let pubsubMessageReceiveResult: PubSubReceiveMessageResult = subscriber.messageCallback(message);
+        for (const subscriber of this.subscribers) {
+            const pubsubMessageReceiveResult: PubSubReceiveMessageResult = subscriber.messageCallback(message);
 
             if (!pubsubMessageReceiveResult.messageHandled) {
                 allHandled = false;
@@ -181,7 +181,7 @@ export class ThrottledMemoryQueuePubSubManager implements IPubSubManager {
     }
 
     private sendSubscribersError(err: Error): void {
-        for (let subscriber of this.subscribers) {
+        for (const subscriber of this.subscribers) {
             subscriber.errorCallback(err);
         }
     }

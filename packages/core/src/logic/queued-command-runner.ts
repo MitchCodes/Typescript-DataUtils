@@ -107,7 +107,7 @@ export class QueuedCommandRunner extends EventEmitter {
             return;
         }
 
-        let noMoreJobs: boolean = await this.handleNextJob();
+        const noMoreJobs: boolean = await this.handleNextJob();
         if (this.settings.autoStopOnNoJobs && noMoreJobs) {
             this.processing = false;
             await this.cleanup();
@@ -133,7 +133,7 @@ export class QueuedCommandRunner extends EventEmitter {
 
     // Promise resolves once the next job is handled (true for no more jobs, false for more jobs)
     private async handleNextJob(): Promise<boolean> {
-        let nextJob: QueuedCommandJob | undefined = this.queue.pop();
+        const nextJob: QueuedCommandJob | undefined = this.queue.pop();
         if (!nextJob) {
             return true;
         }
@@ -160,7 +160,7 @@ export class QueuedCommandRunner extends EventEmitter {
                         await this.startJobInQueue(nextJob);
                     } else {
                         // start job not concurrent & wait 
-                        let pendingJob: PendingJob = this.startJob(nextJob);
+                        const pendingJob: PendingJob = this.startJob(nextJob);
                         await pendingJob.jobPromise;
                     }
                 }
@@ -173,8 +173,8 @@ export class QueuedCommandRunner extends EventEmitter {
                 } else {
                     // start job not concurrent & wait 
 
-                    let now = Date.now();
-                    let pendingJob: PendingJob = this.startJob(nextJob);
+                    const now = Date.now();
+                    const pendingJob: PendingJob = this.startJob(nextJob);
                     await pendingJob.jobPromise;
                 }
             }
@@ -195,8 +195,8 @@ export class QueuedCommandRunner extends EventEmitter {
 
         this.emit('waitingForJobsToFinish', this.pendingJobs);
 
-        let jobPromises: Promise<void>[] = [];
-        for (let pendingJob of this.pendingJobs) {
+        const jobPromises: Promise<void>[] = [];
+        for (const pendingJob of this.pendingJobs) {
             jobPromises.push(pendingJob.jobPromise);
         }
 
@@ -218,7 +218,7 @@ export class QueuedCommandRunner extends EventEmitter {
             this.concurrentQueue = cq.default();
             this.concurrentQueue.limit({concurrency: job.concurrencyGroup.maxConcurrent});
             this.concurrentQueueProcessFn = this.concurrentQueue.process(async (pendingJob: PendingJob) => {
-                let queuedJob: QueuedCommandJob = pendingJob.job;
+                const queuedJob: QueuedCommandJob = pendingJob.job;
                 await queuedJob.doWork().then(() => {
                     this.emit('finishJob', job);
 
@@ -228,7 +228,7 @@ export class QueuedCommandRunner extends EventEmitter {
                     return;
                 });
 
-                let pendingJobsIndex: number = this.pendingJobs.indexOf(pendingJob);
+                const pendingJobsIndex: number = this.pendingJobs.indexOf(pendingJob);
                 if (pendingJobsIndex !== -1) {
                     this.pendingJobs.splice(pendingJobsIndex, 1);
                 }
@@ -241,7 +241,7 @@ export class QueuedCommandRunner extends EventEmitter {
             this.pendingJobs = [];
         }
 
-        let pendingJob: PendingJob = new PendingJob();
+        const pendingJob: PendingJob = new PendingJob();
         pendingJob.job = job;
         pendingJob.jobPromise = new Promise<void>((resolve : () => void) => {
             pendingJob.jobPromiseResolver = resolve;
@@ -259,7 +259,7 @@ export class QueuedCommandRunner extends EventEmitter {
     private startJob(job: QueuedCommandJob): PendingJob {
         this.emit('startJob', job);
 
-        let pendingJob: PendingJob = new PendingJob();
+        const pendingJob: PendingJob = new PendingJob();
         pendingJob.job = job;
         pendingJob.jobPromise = job.doWork().then(() => {
             this.emit('finishJob', job);

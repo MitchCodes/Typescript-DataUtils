@@ -3,14 +3,14 @@ import { FunctionHelper } from "./helpers/function.helper";
 
 export class RoundRobinClassFunctionDistributorAlgorithm implements IClassFunctionDistributorAlgorithm {
     getNextInstance<T>(input: T & IClassFunctionDistributor<T>, calculateNewInstance: boolean): T {
-        let inputAny: any = <any>input;
+        const inputAny: any = <any>input;
         if (inputAny.currentInstanceIndex === undefined || inputAny.currentInstanceIndex === null) {
             inputAny.currentInstanceIndex = -1;
         }
         
         if (calculateNewInstance) {
             let newInstanceIndex: number = inputAny.currentInstanceIndex + 1;
-            let numberOfInstances: number = input.instances.length;
+            const numberOfInstances: number = input.instances.length;
             if (newInstanceIndex >= numberOfInstances) {
                 newInstanceIndex = 0;
             }
@@ -28,13 +28,13 @@ export class RoundRobinClassFunctionDistributorAlgorithm implements IClassFuncti
 
 export class RandomClassFunctionDistributorAlgorithm implements IClassFunctionDistributorAlgorithm {
     getNextInstance<T>(input: T & IClassFunctionDistributor<T>, calculateNewInstance: boolean): T {
-        let inputAny: any = <any>input;
+        const inputAny: any = <any>input;
         if (inputAny.currentInstanceIndex === undefined || inputAny.currentInstanceIndex === null) {
             inputAny.currentInstanceIndex = -1;
         }
         
         if (calculateNewInstance) {
-            let newInstanceIndex: number = Math.floor(Math.random() * input.instances.length);
+            const newInstanceIndex: number = Math.floor(Math.random() * input.instances.length);
 
             inputAny.currentInstanceIndex = newInstanceIndex;
         } else {
@@ -69,7 +69,7 @@ export class ClassFunctionDistributorCreator implements IClassFunctionDistributo
         };
 
         newObj.removeInstance = (instance: T): void => {
-            let index: number = newObj.instances.indexOf(instance);
+            const index: number = newObj.instances.indexOf(instance);
             if (index !== -1) {
                 newObj.instances.splice(index, 1);
             }
@@ -79,12 +79,12 @@ export class ClassFunctionDistributorCreator implements IClassFunctionDistributo
             return algorithm.getNextInstance(newObj, calculateNewInstance);
         };        
 
-        let functionHelper: FunctionHelper = new FunctionHelper();
-        let functions: string[] = functionHelper.getAllFunctions(objToGetFunctions, true);
-        for (let key of functions) {
+        const functionHelper: FunctionHelper = new FunctionHelper();
+        const functions: string[] = functionHelper.getAllFunctions(objToGetFunctions, true);
+        for (const key of functions) {
             if (objToGetFunctions[key] && typeof objToGetFunctions[key] === 'function') {
                 newObj[key] = (...args) => {
-                    let instance: any = newObj.getNextInstance(true);
+                    const instance: any = newObj.getNextInstance(true);
                     if (instance[key]) {
                         return instance[key].apply(instance, args);
                     } else {

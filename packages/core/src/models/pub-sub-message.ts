@@ -24,7 +24,7 @@ export class PubsubDocumentResult implements IOperationResult {
     }
 
     public static buildSimpleError<T>(errorString: string, errorObj: Error = null): PubsubDocumentResult {
-        let azureRes: PubsubDocumentResult = new this();
+        const azureRes: PubsubDocumentResult = new this();
         azureRes.status = OperationResultStatus.error;
         azureRes.message = errorString;
 
@@ -38,7 +38,7 @@ export class PubsubDocumentResult implements IOperationResult {
     }
 
     public static buildSuccess<T>(): PubsubDocumentResult {
-        let azureRes: PubsubDocumentResult = new this();
+        const azureRes: PubsubDocumentResult = new this();
         azureRes.status = OperationResultStatus.success;
 
         return azureRes;
