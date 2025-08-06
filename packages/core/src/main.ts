@@ -14,6 +14,7 @@ export { IJsonParser, IJsonPropertyHandler, IJsonStringifier } from './models/js
 
 export { IBlobStorageManager } from './models/blob-storage-manager';
 export { BlobInfo } from './models/blob-info';
+export { BlobResult } from './models/blob-result';
 
 export { IQueueStorageManager } from './models/queue-storage-manager';
 export { IQueueMessage, QueueMessageResult } from './models/queue-message';

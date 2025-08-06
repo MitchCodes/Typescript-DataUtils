@@ -45,7 +45,7 @@ interface ServiceResponse {
     headers: { [key: string]: string };
 }
 
-import { IOperationResult, OperationResultStatus, IBlobStorageManager, IOperationResultWithData, Dictionary, BlobInfo } from 'tsdatautils-core';
+import { IOperationResult, OperationResultStatus, IBlobStorageManager, IOperationResultWithData, Dictionary, BlobInfo, BlobResult } from 'tsdatautils-core';
 import { Readable, Writable } from 'stream';
 
 export class AzureBlobOperationResult<T> implements IOperationResultWithData<T> {
@@ -201,7 +201,39 @@ export class AzureBlobStorageManager implements IBlobStorageManager {
         }
     }
 
-    public async getBlobToStream(container: string, blob: string, stream: Writable, options: BlobService.GetBlobRequestOptions = {}): Promise<IOperationResultWithData<BlobInfo>> {
+    public async getBlobToStream(container: string, blob: string, options: BlobService.GetBlobRequestOptions = {}): Promise<IOperationResultWithData<BlobResult>> {
+        try {
+            const containerClient = this.blobServiceClient.getContainerClient(container);
+            const blockBlobClient = containerClient.getBlockBlobClient(blob);
+            
+            const downloadResponse: BlobDownloadResponseParsed = await blockBlobClient.download();
+            
+            let promiseResult: AzureBlobOperationResult<BlobResult> = new AzureBlobOperationResult<BlobResult>();
+            promiseResult.status = OperationResultStatus.success;
+
+            let blobResult: BlobResult = new BlobResult();
+            
+            // Set the readable stream
+            blobResult.stream = downloadResponse.readableStreamBody as NodeJS.ReadableStream;
+            
+            // Set the blob info
+            blobResult.info.contentLength = downloadResponse.contentLength ? downloadResponse.contentLength.toString() : '0';
+            blobResult.info.containerName = container;
+            blobResult.info.contentEncoding = downloadResponse.contentEncoding || '';
+            blobResult.info.contentType = downloadResponse.contentType || '';
+            blobResult.info.creationTime = downloadResponse.createdOn || new Date();
+            blobResult.info.deleted = false; // Downloaded blobs are not deleted
+            blobResult.info.lastModifiedTime = downloadResponse.lastModified || new Date();
+            blobResult.info.name = blob;
+
+            promiseResult.data = blobResult;
+            return promiseResult;
+        } catch (error) {
+            return AzureBlobOperationResult.buildSimpleError('Failed to download blob to stream', error as Error) as any;
+        }
+    }
+
+    public async writeBlobToStream(container: string, blob: string, stream: Writable, options: BlobService.GetBlobRequestOptions = {}): Promise<IOperationResultWithData<BlobInfo>> {
         try {
             const containerClient = this.blobServiceClient.getContainerClient(container);
             const blockBlobClient = containerClient.getBlockBlobClient(blob);
@@ -229,7 +261,7 @@ export class AzureBlobStorageManager implements IBlobStorageManager {
             promiseResult.data = blobInfo;
             return promiseResult;
         } catch (error) {
-            return AzureBlobOperationResult.buildSimpleError('Failed to download blob to stream', error as Error) as any;
+            return AzureBlobOperationResult.buildSimpleError('Failed to write blob to stream', error as Error) as any;
         }
     }
 
