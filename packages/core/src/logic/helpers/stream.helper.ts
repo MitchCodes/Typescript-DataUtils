@@ -1,5 +1,5 @@
 // stream.helper.ts
-import { Readable, Transform } from 'stream';
+import { Readable } from 'stream';
 
 /**
  * Type union of all supported stream types.
@@ -27,7 +27,7 @@ export class StreamHelper {
    *   etc., regardless of the original stream type.
    */
   public static toNodeReadable(input: AnyReadable): Readable {
-    // 1) Already a Node.js Readable ✔️
+    // 1) Already a Node.js Readable
     if (input instanceof Readable) {
       return input;
     }
@@ -35,25 +35,36 @@ export class StreamHelper {
     // 2) WHATWG/Web-standard ReadableStream (duck-typed via .getReader)
     if (typeof (input as any).getReader === 'function') {
       const web = input as ReadableStream<unknown>;
-      // First, treat it as byte-y and convert
-      let node = Readable.fromWeb(web as ReadableStream<Uint8Array>);
+      
+      // Create a manual reader to handle all types properly
+      const reader = web.getReader();
+      return new Readable({
+        async read() {
+          try {
+            const { done, value } = await reader.read();
+            if (done) {
+              this.push(null);
+              return;
+            }
 
-      // If the chunks might not be Uint8Array, decode them to Buffer
-      // by piping through a simple Transform.
-      const decoder = new Transform({
-        transform(chunk, _, cb) {
-          const buf = Buffer.from(
-            typeof chunk === 'string'
-              ? chunk
-              : typeof chunk === 'object'
-              ? JSON.stringify(chunk)
-              : chunk
-          );
-          cb(null, buf);
+            // Convert the value to Buffer based on its type
+            let buffer: Buffer;
+            if (Buffer.isBuffer(value) || value instanceof Uint8Array) {
+              buffer = Buffer.from(value);
+            } else if (typeof value === 'string') {
+              buffer = Buffer.from(value);
+            } else if (typeof value === 'object' && value !== null) {
+              buffer = Buffer.from(JSON.stringify(value));
+            } else {
+              buffer = Buffer.from(String(value));
+            }
+            
+            this.push(buffer);
+          } catch (error) {
+            this.destroy(error as Error);
+          }
         }
       });
-
-      return node.pipe(decoder);
     }
 
     // 3) Legacy NodeJS.ReadableStream → wrap into a modern Readable
