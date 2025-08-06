@@ -71,18 +71,19 @@ export class AzureApplicationInsightsWinstonTransport extends Transport {
     }
 
     private getMessageLevel(winstonLevel: string) {
+        // Map to numeric severity levels for new Application Insights SDK
         const levels = {
-            emerg: Contracts.SeverityLevel.Critical,
-            alert: Contracts.SeverityLevel.Critical,
-            crit: Contracts.SeverityLevel.Critical,
-            error: Contracts.SeverityLevel.Error,
-            warning: Contracts.SeverityLevel.Warning,
-            warn: Contracts.SeverityLevel.Warning,
-            notice: Contracts.SeverityLevel.Information,
-            info: Contracts.SeverityLevel.Information,
-            verbose: Contracts.SeverityLevel.Verbose,
-            debug: Contracts.SeverityLevel.Verbose,
-            silly: Contracts.SeverityLevel.Verbose,
+            emerg: 4, // Critical
+            alert: 4, // Critical
+            crit: 4, // Critical
+            error: 3, // Error
+            warning: 2, // Warning
+            warn: 2, // Warning
+            notice: 1, // Information
+            info: 1, // Information
+            verbose: 0, // Verbose
+            debug: 0, // Verbose
+            silly: 0, // Verbose
         };
     
         return winstonLevel in levels ? levels[winstonLevel] : levels.info;
