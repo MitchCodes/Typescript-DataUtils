@@ -61,17 +61,20 @@ class CompatTableQuery implements TableQuery {
     private conditions: string[] = [];
     
     where(condition: string, ...args: any[]): TableQuery {
-        this.conditions.push(`${condition} (${args.join(', ')})`);
+        const processedCondition = this.replaceParameterPlaceholders(condition, args);
+        this.conditions.push(processedCondition);
         return this;
     }
     
     and(condition: string, ...args: any[]): TableQuery {
-        this.conditions.push(`AND ${condition} (${args.join(', ')})`);
+        const processedCondition = this.replaceParameterPlaceholders(condition, args);
+        this.conditions.push(`and ${processedCondition}`);
         return this;
     }
     
     or(condition: string, ...args: any[]): TableQuery {
-        this.conditions.push(`OR ${condition} (${args.join(', ')})`);
+        const processedCondition = this.replaceParameterPlaceholders(condition, args);
+        this.conditions.push(`or ${processedCondition}`);
         return this;
     }
     
@@ -85,6 +88,26 @@ class CompatTableQuery implements TableQuery {
     
     toQueryObject(): string {
         return this.conditions.join(' ');
+    }
+    
+    private replaceParameterPlaceholders(condition: string, args: any[]): string {
+        let result = condition;
+        for (const arg of args) {
+            if (typeof arg === 'string') {
+                // Properly escape string values with single quotes for OData
+                result = result.replace('?', `'${arg.replace(/'/g, "''")}'`);
+            } else if (typeof arg === 'number') {
+                result = result.replace('?', arg.toString());
+            } else if (typeof arg === 'boolean') {
+                result = result.replace('?', arg.toString());
+            } else if (arg instanceof Date) {
+                result = result.replace('?', `datetime'${arg.toISOString()}'`);
+            } else {
+                // For other types, convert to string and escape
+                result = result.replace('?', `'${String(arg).replace(/'/g, "''")}'`);
+            }
+        }
+        return result;
     }
 }
 
