@@ -31,6 +31,7 @@ export { IClassFunctionDistributor, IClassFunctionDistributorCreator, IClassFunc
 export { ModelComparer } from './logic/helpers/modelcompare.helper';
 export { ErrorHelper } from './logic/helpers/error.helper';
 export { FunctionHelper } from './logic/helpers/function.helper';
+export { StreamHelper, AnyReadable } from './logic/helpers/stream.helper';
 
 // Loggers
 export { WinstonLogger, WinstonDateStampFormatModifier, WinstonDateStampModifier, WinstonDateStampType, WinstonInterpolateModifier, WinstonLogMessageModifier } from './logic/loggers/winston-logger';
