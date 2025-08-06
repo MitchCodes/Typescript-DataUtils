@@ -947,10 +947,8 @@ export class AzureDocumentStorageManager<T extends IAzureDocumentSavable> implem
 
         let azureObjectKeys: string[] = Object.keys(azureObj);
 
-        // tslint:disable-next-line:no-string-literal
-        returnObj['partitionKey'] = azureObj['PartitionKey']._;
-        // tslint:disable-next-line:no-string-literal
-        returnObj['rowKey'] = azureObj['RowKey']._;
+        returnObj['partitionKey'] = azureObj['PartitionKey'];
+        returnObj['rowKey'] = azureObj['RowKey'];
         
         for (let key of azureObjectKeys) {
             if (key === 'PartitionKey' || key === 'RowKey') {
@@ -961,22 +959,22 @@ export class AzureDocumentStorageManager<T extends IAzureDocumentSavable> implem
 
             switch (azureModel.$) {
                 case TableUtilities.EdmType.INT64:
-                    returnObj[key] = Number(azureObj[key]._);
+                    returnObj[key] = Number(azureObj[key]);
                     break;
                 case TableUtilities.EdmType.INT32:
-                    returnObj[key] = Number(azureObj[key]._);
+                    returnObj[key] = Number(azureObj[key]);
                     break;
                 case TableUtilities.EdmType.DOUBLE:
-                    returnObj[key] = Number(azureObj[key]._);
+                    returnObj[key] = Number(azureObj[key]);
                     break;
                 case TableUtilities.EdmType.BOOLEAN:
-                    returnObj[key] = Boolean(azureObj[key]._);
+                    returnObj[key] = Boolean(azureObj[key]);
                     break;
                 case TableUtilities.EdmType.DATETIME:
-                    returnObj[key] = new Date(azureObj[key]._);
+                    returnObj[key] = new Date(azureObj[key]);
                     break;
                 default:
-                    returnObj[key] = azureObj[key]._;
+                    returnObj[key] = azureObj[key];
             }
             
         }
