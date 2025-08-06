@@ -36,15 +36,17 @@ webpack.prod.json
 tsconfig.json
 tsconfig.release.json
 
-# Source Files
+# Source Files (only exclude source, not build output)
 src/
 
 # Linting
 tslint.json
+eslint.config.js
+.eslintcache
 
 # Testing
 jest/
-jest.config.json
+jest.config.js
 __tests__/
 
 # Misc
