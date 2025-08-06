@@ -35,7 +35,7 @@ export class BasicMemoryCache implements IBasicCache, IBasicTimedCache, IClearab
     public getItemAsync<T>(key: string): Promise<T> {
         return new Promise<T>((resolve: (val: T) => void, reject: (reason: any) => void) => {
             try {
-                let item: T = this.getItem<T>(key);
+                const item: T = this.getItem<T>(key);
 
                 resolve(item);
             } catch (ex) {
@@ -54,7 +54,7 @@ export class BasicMemoryCache implements IBasicCache, IBasicTimedCache, IClearab
     public setItemAsync<T>(key: string, item: T, ttl: moment.Duration = null): Promise<boolean> {
         return new Promise<boolean>((resolve: (val: boolean) => void, reject: (reason: any) => void) => {
             try {
-                let worked: boolean = this.setItem<T>(key, item, ttl);
+                const worked: boolean = this.setItem<T>(key, item, ttl);
 
                 resolve(worked);
             } catch (ex) {
@@ -72,7 +72,7 @@ export class BasicMemoryCache implements IBasicCache, IBasicTimedCache, IClearab
     public removeItemAsync(key: string): Promise<boolean> {
         return new Promise<boolean>((resolve: (val: boolean) => void, reject: (reason: any) => void) => {
             try {
-                let worked: boolean = this.removeItem(key);
+                const worked: boolean = this.removeItem(key);
 
                 resolve(worked);
             } catch (ex) {
@@ -105,8 +105,8 @@ export class BasicMemoryCache implements IBasicCache, IBasicTimedCache, IClearab
     }
 
     private isItemExpired(tableCache: CacheData, key: string): boolean {
-        let currentTime: moment.Moment = moment();
-        let expiration: moment.Moment = tableCache.expireDict[key];
+        const currentTime: moment.Moment = moment();
+        const expiration: moment.Moment = tableCache.expireDict[key];
         if (expiration !== undefined && expiration !== null && currentTime.isAfter(expiration)) {
             return true;
         }
@@ -137,11 +137,11 @@ export class BasicMemoryCache implements IBasicCache, IBasicTimedCache, IClearab
 
     // Will clean up any remaining expired cached entities.
     private cleanup(): void {
-        let now: moment.Moment = moment();
+        const now: moment.Moment = moment();
         // clean up expired entities
         Object.keys(this.cache.entityDict).forEach((entityKey: string) => {
-            let entity: any = this.cache.entityDict[entityKey];
-            let expireTime: moment.Moment = this.cache.expireDict[entityKey];
+            const entity: any = this.cache.entityDict[entityKey];
+            const expireTime: moment.Moment = this.cache.expireDict[entityKey];
             if (now.isAfter(expireTime)) {
                 this.resetCacheItem(this.cache, entityKey);
             }

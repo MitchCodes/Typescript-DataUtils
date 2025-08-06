@@ -28,8 +28,8 @@ export class AzureTableDocumentCacheInMemory<T extends DocumentIdentifier> imple
     }
 
     public getItem(table: string, id: DocumentIdentifier): T {
-        let basicId: BasicDocumentIdentifier = new BasicDocumentIdentifier(id.partitionKey, id.rowKey);
-        let tableCache: AzureDocumentTableCacheData<T> = this.getTableCache(table);
+        const basicId: BasicDocumentIdentifier = new BasicDocumentIdentifier(id.partitionKey, id.rowKey);
+        const tableCache: AzureDocumentTableCacheData<T> = this.getTableCache(table);
         let cachedObj: T = tableCache.entityDict[basicId.cacheKey];
         if (cachedObj === undefined) {
             return null;
@@ -45,14 +45,14 @@ export class AzureTableDocumentCacheInMemory<T extends DocumentIdentifier> imple
 
     // tslint:disable:no-console
     public setItem(table: string, obj: T, expirationDur: moment.Duration): void {
-        let tableCache: AzureDocumentTableCacheData<T> = this.getTableCache(table);
-        let identifier: BasicDocumentIdentifier = new BasicDocumentIdentifier(obj.partitionKey, obj.rowKey);
+        const tableCache: AzureDocumentTableCacheData<T> = this.getTableCache(table);
+        const identifier: BasicDocumentIdentifier = new BasicDocumentIdentifier(obj.partitionKey, obj.rowKey);
         this.setItemById(tableCache, obj, identifier, expirationDur);
         this.cleanupIfTime();
     }
 
     public resetTableCache(table: string): void {
-        let tableCache: AzureDocumentTableCacheData<T> = this.getTableCache(table);
+        const tableCache: AzureDocumentTableCacheData<T> = this.getTableCache(table);
         tableCache.entityDict = {};
         tableCache.expireDict = {};
         tableCache.queryDict = {};
@@ -60,7 +60,7 @@ export class AzureTableDocumentCacheInMemory<T extends DocumentIdentifier> imple
     }
 
     public invalidateCacheItem(table: string, id: BasicDocumentIdentifier): void {
-        let tableCache: AzureDocumentTableCacheData<T> = this.getTableCache(table);
+        const tableCache: AzureDocumentTableCacheData<T> = this.getTableCache(table);
         this.resetCacheItem(tableCache, id);
     }
 
@@ -70,8 +70,8 @@ export class AzureTableDocumentCacheInMemory<T extends DocumentIdentifier> imple
     }
 
     private isItemExpired(tableCache: AzureDocumentTableCacheData<T>, id: BasicDocumentIdentifier): boolean {
-        let currentTime: moment.Moment = moment();
-        let expiration: moment.Moment = tableCache.expireDict[id.cacheKey];
+        const currentTime: moment.Moment = moment();
+        const expiration: moment.Moment = tableCache.expireDict[id.cacheKey];
         if (expiration !== undefined && expiration !== null && currentTime.isAfter(expiration)) {
             return true;
         }
@@ -80,8 +80,8 @@ export class AzureTableDocumentCacheInMemory<T extends DocumentIdentifier> imple
     }
 
     private isQueryExpired(tableCache: AzureDocumentTableCacheData<T>, queryString: string): boolean {
-        let currentTime: moment.Moment = moment();
-        let expiration: moment.Moment = tableCache.queryExpireDict[queryString];
+        const currentTime: moment.Moment = moment();
+        const expiration: moment.Moment = tableCache.queryExpireDict[queryString];
         if (expiration !== undefined && expiration !== null && currentTime.isAfter(expiration)) {
             return true;
         }
@@ -125,23 +125,23 @@ export class AzureTableDocumentCacheInMemory<T extends DocumentIdentifier> imple
 
     // Will clean up any remaining expired cached entities.
     private cleanup(): void {
-        let now: moment.Moment = moment();
+        const now: moment.Moment = moment();
         Object.keys(this.cache.tableDict).forEach((tableKey: string) => {
-            let tableCache: AzureDocumentTableCacheData<T> = this.cache.tableDict[tableKey];
+            const tableCache: AzureDocumentTableCacheData<T> = this.cache.tableDict[tableKey];
 
             // clean up expired entities
             Object.keys(tableCache.entityDict).forEach((entityKey: string) => {
-                let entity: T = tableCache.entityDict[entityKey];
-                let expireTime: moment.Moment = tableCache.expireDict[entityKey];
+                const entity: T = tableCache.entityDict[entityKey];
+                const expireTime: moment.Moment = tableCache.expireDict[entityKey];
                 if (now.isAfter(expireTime)) {
-                    let identifier: BasicDocumentIdentifier = new BasicDocumentIdentifier(entity.partitionKey, entity.rowKey);
+                    const identifier: BasicDocumentIdentifier = new BasicDocumentIdentifier(entity.partitionKey, entity.rowKey);
                     this.resetCacheItem(tableCache, identifier);
                 }
             });
 
             // clean up expired queries
             Object.keys(tableCache.queryDict).forEach((queryKey: string) => {
-                let queryExpireTime: moment.Moment = tableCache.queryExpireDict[queryKey];
+                const queryExpireTime: moment.Moment = tableCache.queryExpireDict[queryKey];
                 if (now.isAfter(queryExpireTime)) {
                     this.resetCacheQuery(tableCache, queryKey);
                 }

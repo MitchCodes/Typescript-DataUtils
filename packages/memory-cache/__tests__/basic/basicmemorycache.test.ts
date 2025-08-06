@@ -2,7 +2,6 @@ import { Logger, createLogger, transports } from 'winston';
 import * as moment from 'moment';
 import { BasicMemoryCache } from '../../src/data/basic-memory-cache';
 import { IBasicCache, IBasicTimedCache, IClearableCache, ModelComparer } from 'tsdatautils-core';
-jest.mock('../../src/data/basic-memory-cache');
 
 export class CarTest {
     public partitionKey: string;
@@ -53,17 +52,17 @@ describe('basic memory cache tests', () => {
     });
 
     test('expect inner cache not to be null', () => {
-        let cache: IBasicCache = new BasicMemoryCache();
-        let cacheAny: any = <any>cache;
+        const cache: IBasicCache = new BasicMemoryCache();
+        const cacheAny: any = <any>cache;
         expect(cacheAny.cache).not.toBeNull();
     });
 
     test('can set item in cache', () => {
-        let cache: IBasicCache = new BasicMemoryCache();
-        let cacheAny: any = <any>cache;
+        const cache: IBasicCache = new BasicMemoryCache();
+        const cacheAny: any = <any>cache;
 
-        let key: string = 'basic key';
-        let bogusKey: string = 'bogus';
+        const key: string = 'basic key';
+        const bogusKey: string = 'bogus';
 
         cache.setItem(key, testModel);
 
@@ -81,17 +80,17 @@ describe('basic memory cache tests', () => {
     });
 
     test('can get item in cache', () => {
-        let cache: IBasicCache = new BasicMemoryCache();
-        let cacheAny: any = <any>cache;
-        let comparer: ModelComparer<CarTest> = new ModelComparer<CarTest>();
+        const cache: IBasicCache = new BasicMemoryCache();
+        const cacheAny: any = <any>cache;
+        const comparer: ModelComparer<CarTest> = new ModelComparer<CarTest>();
 
-        let key: string = 'basic key';
-        let bogusKey: string = 'bogus';
+        const key: string = 'basic key';
+        const bogusKey: string = 'bogus';
 
-        let worked: boolean = cache.setItem(key, testModel);
+        const worked: boolean = cache.setItem(key, testModel);
         expect(worked).toBeTruthy();
 
-        let car: CarTest = cache.getItem<CarTest>(key);
+        const car: CarTest = cache.getItem<CarTest>(key);
 
         logger.info('Non-cached model: ' + JSON.stringify(testModel));
         logger.info('Cached model: ' + JSON.stringify(car));
@@ -101,43 +100,43 @@ describe('basic memory cache tests', () => {
         expect(car.make).toEqual('Honda');
         expect(comparer.propertiesAreEqualToFirst(car, testModel)).toBeTruthy();
 
-        let bogusCar: CarTest = cache.getItem<CarTest>(bogusKey);
+        const bogusCar: CarTest = cache.getItem<CarTest>(bogusKey);
         expect(bogusCar).toBeNull();
     });
 
     test('can remove item in cache', () => {
-        let cache: IBasicCache = new BasicMemoryCache();
-        let cacheAny: any = <any>cache;
+        const cache: IBasicCache = new BasicMemoryCache();
+        const cacheAny: any = <any>cache;
 
-        let key: string = 'basic key';
-        let bogusKey: string = 'bogus';
+        const key: string = 'basic key';
+        const bogusKey: string = 'bogus';
 
         cache.setItem(key, testModel);
 
-        let car: CarTest = cache.getItem<CarTest>(key);
+        const car: CarTest = cache.getItem<CarTest>(key);
 
         expect(testModel.make).toEqual('Honda');
 
-        let worked: boolean = cache.removeItem(key);
+        const worked: boolean = cache.removeItem(key);
         expect(worked).toBeTruthy();
         
         expect(cacheAny.cache.entityDict[key]).not.toBeNull();
         expect(cacheAny.cache.entityDict[key]).toBeUndefined();
 
-        let bogusWorked: boolean = cache.removeItem(bogusKey);
+        const bogusWorked: boolean = cache.removeItem(bogusKey);
         expect(bogusWorked).toBeTruthy();
     });
 
     test('test clearing cache', () => {
-        let cache: IBasicCache & IClearableCache = new BasicMemoryCache();
-        let cacheAny: any = <any>cache;
+        const cache: IBasicCache & IClearableCache = new BasicMemoryCache();
+        const cacheAny: any = <any>cache;
 
-        let key: string = 'basic key';
-        let bogusKey: string = 'bogus';
+        const key: string = 'basic key';
+        const bogusKey: string = 'bogus';
 
         cache.setItem(key, testModel);
 
-        let car: CarTest = cache.getItem<CarTest>(key);
+        const car: CarTest = cache.getItem<CarTest>(key);
 
         expect(testModel.make).toEqual('Honda');
 
@@ -148,12 +147,12 @@ describe('basic memory cache tests', () => {
     });
 
     test('cache cleanup', (done: any) => {
-        let cache: IBasicTimedCache = new BasicMemoryCache();
-        let cacheAny: any = <any>cache;
+        const cache: IBasicTimedCache = new BasicMemoryCache();
+        const cacheAny: any = <any>cache;
 
-        let bogusKey: string = 'bogus';
+        const bogusKey: string = 'bogus';
 
-        let newCar: CarTest = new CarTest();
+        const newCar: CarTest = new CarTest();
         newCar.partitionKey = 'cachecarscleanup';
         newCar.rowKey = 'car1';
         newCar.color = 'Blue';
@@ -164,9 +163,9 @@ describe('basic memory cache tests', () => {
         newCar.turboType = undefined; // test undefined scenario
         newCar.engine = { isPowerful: true };
         newCar.isOn = false;
-        let newCarKey: string = 'basic key';
+        const newCarKey: string = 'basic key';
 
-        let newCar2: CarTest = new CarTest();
+        const newCar2: CarTest = new CarTest();
         newCar2.partitionKey = 'cachecarscleanup';
         newCar2.rowKey = 'car2';
         newCar2.color = 'Blue';
@@ -177,7 +176,7 @@ describe('basic memory cache tests', () => {
         newCar2.turboType = undefined; // test undefined scenario
         newCar2.engine = { isPowerful: true };
         newCar2.isOn = false;
-        let newCarTwoKey: string = 'basic key2';
+        const newCarTwoKey: string = 'basic key2';
 
         cache.setItem(newCarKey, newCar, moment.duration(1, 'days'));
         cache.setItem(newCarTwoKey, newCar2, moment.duration(0));
@@ -189,8 +188,8 @@ describe('basic memory cache tests', () => {
         let cachedCar: any = cacheAny.cache.entityDict[newCarKey];
         let cachedCarExpire: any = cacheAny.cache.expireDict[newCarKey];
 
-        let cachedCar2: any = cacheAny.cache.entityDict[newCarTwoKey];
-        let cachedCarExpire2: any = cacheAny.cache.expireDict[newCarTwoKey];
+        const cachedCar2: any = cacheAny.cache.entityDict[newCarTwoKey];
+        const cachedCarExpire2: any = cacheAny.cache.expireDict[newCarTwoKey];
 
         expect(cachedCar).not.toBeUndefined();
         expect(cachedCarExpire).not.toBeUndefined();
