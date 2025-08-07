@@ -881,7 +881,7 @@ export class AzureDocumentStorageManager<T extends IAzureDocumentSavable> implem
         return result;
     }
 
-    private convertToAzureObj(obj: any): Object {
+    private convertToAzureObj(obj: any, useLegacyTypeConversation: boolean = false): Object {
         let entGen = TableUtilities.entityGenerator;
         let returnObj: Object = {};
 
@@ -896,48 +896,77 @@ export class AzureDocumentStorageManager<T extends IAzureDocumentSavable> implem
         }
 
         let objectKeys: string[] = Object.keys(convertedObj);
-        // tslint:disable-next-line:no-string-literal
-        returnObj['PartitionKey'] = entGen.String(convertedObj.partitionKey);
-        // tslint:disable-next-line:no-string-literal
-        returnObj['RowKey'] = entGen.String(convertedObj.rowKey);
-        for (let key of objectKeys) {
-            if (key === 'partitionKey' || key === 'rowKey') {
-                continue;
-            }
-            let keyType = typeof convertedObj[key];
-            if (keyType === 'function' || keyType === 'symbol' || keyType === 'undefined') {
-                continue;
-            } else if (keyType === 'object') {
-                if (convertedObj[key] instanceof Date) {
-                    returnObj[key] = entGen.DateTime(<Date>convertedObj[key]);
+
+        if (useLegacyTypeConversation) {
+            returnObj['PartitionKey'] = entGen.String(convertedObj.partitionKey);
+            returnObj['RowKey'] = entGen.String(convertedObj.rowKey);
+
+            for (let key of objectKeys) {
+                if (key === 'partitionKey' || key === 'rowKey') {
+                    continue;
+                }
+                let keyType = typeof convertedObj[key];
+                if (keyType === 'function' || keyType === 'symbol' || keyType === 'undefined') {
+                    continue;
+                } else if (keyType === 'object') {
+                    if (convertedObj[key] instanceof Date) {
+                        returnObj[key] = entGen.DateTime(<Date>convertedObj[key]);
+                    } else {
+                        continue;
+                    }
+                } else if (keyType === 'boolean') {
+                    returnObj[key] = entGen.Boolean(convertedObj[key]);
+                } else if (keyType === 'number') {
+                    if (Number.isSafeInteger(convertedObj[key])) {
+                        returnObj[key] = entGen.Int64(convertedObj[key]);
+                    } else {
+                        returnObj[key] = entGen.Double(convertedObj[key]);
+                    }
+                } else if (keyType === 'string') {
+                    returnObj[key] = entGen.String(convertedObj[key]);
                 } else {
                     continue;
                 }
-            } else if (keyType === 'boolean') {
-                returnObj[key] = entGen.Boolean(convertedObj[key]);
-            } else if (keyType === 'number') {
-                if (Number.isSafeInteger(convertedObj[key])) {
-                    returnObj[key] = entGen.Int64(convertedObj[key]);
-                } else {
-                    returnObj[key] = entGen.Double(convertedObj[key]);
+            }    
+        } else {
+            returnObj['PartitionKey'] = convertedObj.partitionKey;
+            returnObj['RowKey'] = convertedObj.rowKey;
+            
+            for (let key of objectKeys) {
+                if (key === 'partitionKey' || key === 'rowKey') {
+                    continue;
                 }
-            } else if (keyType === 'string') {
-                returnObj[key] = entGen.String(convertedObj[key]);
-            } else {
-                continue;
+
+                let keyType = typeof convertedObj[key];
+                if (keyType === 'object') {
+                    if (convertedObj[key] instanceof Date) {
+                        returnObj[key] = <Date>convertedObj[key];
+                    } else {
+                        continue;
+                    }
+                } else if (keyType === 'boolean' || keyType === 'number' || keyType === 'string') {
+                    returnObj[key] = convertedObj[key];
+                } else {
+                    continue;
+                }
             }
-        }    
+        }
+        
 
         return returnObj;
     }
 
-    private convertToAzureObjOnlyKeys(obj: T): Object {
+    private convertToAzureObjOnlyKeys(obj: T, useLegacyTypeConversation: boolean = false): Object {
         let entGen = TableUtilities.entityGenerator;
         let returnObj: Object = {};
-        // tslint:disable-next-line:no-string-literal
-        returnObj['PartitionKey'] = entGen.String(obj.partitionKey);
-        // tslint:disable-next-line:no-string-literal
-        returnObj['RowKey'] = entGen.String(obj.rowKey);
+
+        if (useLegacyTypeConversation) {
+            returnObj['PartitionKey'] = entGen.String(obj.partitionKey);
+            returnObj['RowKey'] = entGen.String(obj.rowKey);
+        } else {
+            returnObj['PartitionKey'] = obj.partitionKey;
+            returnObj['RowKey'] = obj.rowKey;
+        }        
 
         return returnObj;
     }
@@ -947,36 +976,39 @@ export class AzureDocumentStorageManager<T extends IAzureDocumentSavable> implem
 
         let azureObjectKeys: string[] = Object.keys(azureObj);
 
-        returnObj['partitionKey'] = azureObj['PartitionKey'];
-        returnObj['rowKey'] = azureObj['RowKey'];
+        returnObj['partitionKey'] = azureObj['partitionKey'] || azureObj['PartitionKey'];
+        returnObj['rowKey'] = azureObj['rowKey'] || azureObj['RowKey'];
         
         for (let key of azureObjectKeys) {
-            if (key === 'PartitionKey' || key === 'RowKey') {
+            if (key === 'PartitionKey' || key === 'RowKey' || key === 'partitionKey' || key === 'rowKey') {
                 continue;
             }
 
             let azureModel: any = azureObj[key];
 
-            switch (azureModel.$) {
-                case TableUtilities.EdmType.INT64:
-                    returnObj[key] = Number(azureObj[key]);
-                    break;
-                case TableUtilities.EdmType.INT32:
-                    returnObj[key] = Number(azureObj[key]);
-                    break;
-                case TableUtilities.EdmType.DOUBLE:
-                    returnObj[key] = Number(azureObj[key]);
-                    break;
-                case TableUtilities.EdmType.BOOLEAN:
-                    returnObj[key] = Boolean(azureObj[key]);
-                    break;
-                case TableUtilities.EdmType.DATETIME:
-                    returnObj[key] = new Date(azureObj[key]);
-                    break;
-                default:
-                    returnObj[key] = azureObj[key];
+            if (azureModel.$) {
+                switch (azureModel.$) {
+                    case TableUtilities.EdmType.INT64:
+                        returnObj[key] = Number(azureObj[key]);
+                        break;
+                    case TableUtilities.EdmType.INT32:
+                        returnObj[key] = Number(azureObj[key]);
+                        break;
+                    case TableUtilities.EdmType.DOUBLE:
+                        returnObj[key] = Number(azureObj[key]);
+                        break;
+                    case TableUtilities.EdmType.BOOLEAN:
+                        returnObj[key] = Boolean(azureObj[key]);
+                        break;
+                    case TableUtilities.EdmType.DATETIME:
+                        returnObj[key] = new Date(azureObj[key]);
+                        break;
+                    default:
+                        returnObj[key] = azureObj[key];
+                }
+            } else {
+                returnObj[key] = azureObj[key];
             }
-            
         }
 
         if (this.converters) {
