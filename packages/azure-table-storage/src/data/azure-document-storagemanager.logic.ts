@@ -929,8 +929,8 @@ export class AzureDocumentStorageManager<T extends IAzureDocumentSavable> implem
                 }
             }    
         } else {
-            returnObj['PartitionKey'] = convertedObj.partitionKey;
-            returnObj['RowKey'] = convertedObj.rowKey;
+            returnObj['partitionKey'] = convertedObj.partitionKey;
+            returnObj['rowKey'] = convertedObj.rowKey;
             
             for (let key of objectKeys) {
                 if (key === 'partitionKey' || key === 'rowKey') {
@@ -964,8 +964,8 @@ export class AzureDocumentStorageManager<T extends IAzureDocumentSavable> implem
             returnObj['PartitionKey'] = entGen.String(obj.partitionKey);
             returnObj['RowKey'] = entGen.String(obj.rowKey);
         } else {
-            returnObj['PartitionKey'] = obj.partitionKey;
-            returnObj['RowKey'] = obj.rowKey;
+            returnObj['partitionKey'] = obj.partitionKey;
+            returnObj['rowKey'] = obj.rowKey;
         }        
 
         return returnObj;
