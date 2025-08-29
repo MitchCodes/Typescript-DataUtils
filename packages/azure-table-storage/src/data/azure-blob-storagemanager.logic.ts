@@ -106,7 +106,7 @@ export class AzureBlobStorageManager implements IBlobStorageManager {
         try {
             const containerClient = this.blobServiceClient.getContainerClient(containerName);
             const createOptions: any = {
-                access: containerOptions.publicAccessLevel || 'private',
+                access: containerOptions.publicAccessLevel || 'blob',
                 metadata: containerOptions.metadata
             };
             
